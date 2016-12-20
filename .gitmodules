@@ -44,3 +44,4 @@
 [submodule "src/morus_modules/morus_uavcan_px4"]
 	path = src/morus_modules/morus_uavcan_px4
 	url = git@github.com:larics/morus_uavcan_px4.git
+	branch = master
