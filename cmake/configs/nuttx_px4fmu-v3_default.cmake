@@ -193,8 +193,11 @@ set(config_module_list
 	# EKF
 	examples/ekf_att_pos_estimator
 
-	examples/publisher
-	examples/subscriber
+	#examples/publisher
+	#examples/subscriber
+
+	# morus modules
+	morus_modules/morus_px4_ctl_sm
 )
 
 set(config_extra_builtin_cmds
