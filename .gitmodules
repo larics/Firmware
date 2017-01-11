@@ -45,3 +45,6 @@
 	path = src/morus_modules/morus_uavcan_px4
 	url = git@github.com:larics/morus_uavcan_px4.git
 	branch = master
+[submodule "morus_px4_ctl_sm"]
+	path = morus_px4_ctl_sm
+	url = git@github.com:larics/morus_px4_ctl_sm.git
