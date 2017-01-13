@@ -41,11 +41,13 @@
 #include <systemlib/err.h>
 #include <systemlib/systemlib.h>
 
+#include <px4_tasks.h>
+
 extern bool thread_running;
-int daemon_task;             /**< Handle of deamon task / thread */
+int daemon_task_pub;             /**< Handle of deamon task / thread */
 namespace px4
 {
-bool task_should_exit = false;
+bool task_should_exit_pub = false;
 }
 using namespace px4;
 
@@ -66,9 +68,9 @@ int publisher_main(int argc, char *argv[])
 			exit(0);
 		}
 
-		task_should_exit = false;
+		task_should_exit_pub = false;
 
-		daemon_task = px4_task_spawn_cmd("publisher",
+		daemon_task_pub = px4_task_spawn_cmd("publisher",
 						 SCHED_DEFAULT,
 						 SCHED_PRIORITY_MAX - 5,
 						 2000,
@@ -79,7 +81,7 @@ int publisher_main(int argc, char *argv[])
 	}
 
 	if (!strcmp(argv[1], "stop")) {
-		task_should_exit = true;
+		task_should_exit_pub = true;
 		exit(0);
 	}
 
