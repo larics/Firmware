@@ -125,6 +125,8 @@ set(msg_file_names
 	mount_orientation.msg
 	collision_report.msg
 	low_stack.msg
+	morus/controllers_switch.msg
+	morus/controllers_reference.msg
 	)
 
 # Get absolute paths
