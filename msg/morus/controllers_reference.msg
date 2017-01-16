@@ -1,3 +1,7 @@
+#
+# Add comment.
+#
+
 float32 x		# referent x position in NED frame
 float32 y   	# referent y position in NED frame
 float32 z		# referent z position in NED frame
