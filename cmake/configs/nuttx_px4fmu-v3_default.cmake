@@ -100,7 +100,7 @@ set(config_module_list
 	modules/load_mon
 	modules/mavlink
 	modules/navigator
-	modules/uavcan
+	# modules/uavcan
 
 	#
 	# Estimation modules
@@ -198,6 +198,7 @@ set(config_module_list
 
 	# morus modules
 	morus_modules/morus_px4_ctl_sm
+	morus_modules/morus_uavcan_px4
 )
 
 set(config_extra_builtin_cmds
