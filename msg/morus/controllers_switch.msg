@@ -1,7 +1,6 @@
 #
 # Add comment.
 #
-
 bool armed		# true if armed
 
 bool x_ctrl		# if true position controller for x axis is on
