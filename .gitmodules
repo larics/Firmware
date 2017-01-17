@@ -54,3 +54,6 @@
 [submodule "src/morus_modules/morus_px4_ctl_sm"]
 	path = src/morus_modules/morus_px4_ctl_sm
 	url = git@github.com:larics/morus_px4_ctl_sm.git
+[submodule "src/morus_modules/morus_position_control"]
+	path = src/morus_modules/morus_position_control
+	url = git@github.com:larics/morus_position_control.git
