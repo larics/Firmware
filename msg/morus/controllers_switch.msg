@@ -2,10 +2,10 @@
 # Add comment.
 #
 
-bool ARMED=true			# vehicle armed
-bool DISARMED=false		# vehicle disarmed
-bool ON=true			# controller on
-bool OFF=false			# controller off
+bool ARMED=True			# vehicle armed
+bool DISARMED=False		# vehicle disarmed
+bool ON=True			# controller on
+bool OFF=False			# controller off
 
 bool armed				# values ARMED or DISARMED
 
