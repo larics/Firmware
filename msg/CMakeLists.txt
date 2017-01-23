@@ -128,6 +128,9 @@ set(msg_file_names
 	morus/controllers_switch.msg
 	morus/controllers_reference.msg
 	morus/attitude_controller_reference.msg
+	morus/gm_status.msg
+	morus/mm_status.msg
+	morus/acu_power_status.msg
 	)
 
 # Get absolute paths
