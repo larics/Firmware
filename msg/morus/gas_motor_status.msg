@@ -9,7 +9,7 @@ float32 temperature_L		# measured temperature of left cylinder [°C], range: [-5
 
 float32 throttle		# measured throttle position, in percentage (0-1) 
 uint8 choke			# measured choke position, range: [0, 1]
-uint8 fuel_level		# measured fuel level [%], range: [0, 100]
+float32 fuel_level		# measured fuel level [%], range: [0, 1]
 
 float32[5] vibration_frequency 	# frequency of measured vibrations
 float32[5] vibration_amplitude	# amplitude of measured vibrations
