@@ -20,4 +20,4 @@ bool controller_velocity_z          # values AUTO or MAN
 bool controller_yaw                 # values AUTO or MAN
 bool controller_yaw_rate            # values AUTO or MAN
 
-# TOPICS controllers_mode mcu_controllers_mode ctrl_sm_controllers_mode
+# TOPICS controllers_mode mcu_controllers_mode commander_controllers_mode

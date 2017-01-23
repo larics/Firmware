@@ -22,4 +22,4 @@ float32 yaw_manual_rpm        # rotor angular velocity change in rpm used to con
 
 float32 throttle              # throttle ref (manual mode) in percentage (0-1), should be ignored if height controller in AUTO mode
 
-# TOPICS position_controller_setpoint mcu_position_controller_setpoint ctrl_sm_position_controller_setpoint
+# TOPICS position_controller_setpoint mcu_position_controller_setpoint commander_position_controller_setpoint
