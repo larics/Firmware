@@ -127,6 +127,7 @@ set(msg_file_names
 	low_stack.msg
 	morus/controllers_switch.msg
 	morus/controllers_reference.msg
+	morus/attitude_controller_reference.msg
 	)
 
 # Get absolute paths
