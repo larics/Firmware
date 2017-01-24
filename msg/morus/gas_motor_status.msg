@@ -4,6 +4,8 @@
 
 uint64 acu_can_timestamp	# can timestamp on acu
 
+float32 speed			# measured speed [RPM]
+
 float32 temperature_R		# measured temperature of right cylinder [°C], range: [-55,150]
 float32 temperature_L		# measured temperature of left cylinder [°C], range: [-55,150]
 
