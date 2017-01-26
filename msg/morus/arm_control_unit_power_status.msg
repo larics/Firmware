@@ -2,8 +2,6 @@
 # Add comment.
 #
 
-uint64 acu_can_timestamp	# can timestamp on acu
-
 float32 voltage			# measured battery voltage [V]
 float32 current			# measured battery current [A]
 
