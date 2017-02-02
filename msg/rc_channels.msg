@@ -31,3 +31,5 @@ int8[24] function						# Functions mapping
 uint8 rssi							# Receive signal strength indicator (0-100)
 bool signal_lost						# Control signal lost, should be checked together with topic timeout
 uint32 frame_drop_count						# Number of dropped frames
+
+# TOPICS rc_channels hmi_rc_channels

@@ -128,9 +128,12 @@ set(msg_file_names
 	morus/controllers_switch.msg
 	morus/controllers_reference.msg
 	morus/attitude_controller_reference.msg
+  morus/controllers_mode.msg
+  morus/position_controller_setpoint.msg
 	morus/gas_motor_status.msg
 	morus/moving_mass_status.msg
 	morus/arm_control_unit_power_status.msg
+  morus/gas_motor_ignition_reference.msg
 	)
 
 # Get absolute paths
