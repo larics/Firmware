@@ -193,8 +193,13 @@ set(config_module_list
 	# EKF
 	#examples/ekf_att_pos_estimator
 
+	# MORUS libraries
+	morus_lib/pid
+
 	# MORUS modules
 	morus_modules/morus_uavcan_px4
+	morus_modules/morus_attitude_control
+	morus_modules/morus_position_control
 )
 
 set(config_extra_builtin_cmds
