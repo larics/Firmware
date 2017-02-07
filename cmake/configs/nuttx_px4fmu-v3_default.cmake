@@ -100,24 +100,24 @@ set(config_module_list
 	modules/load_mon
 	modules/mavlink
 	modules/navigator
-	modules/uavcan
+  #modules/uavcan
 
 	#
 	# Estimation modules
 	#
-	modules/attitude_estimator_q
+  #modules/attitude_estimator_q
 	modules/ekf2
-	modules/local_position_estimator
-	modules/position_estimator_inav
+  #modules/local_position_estimator
+  #modules/position_estimator_inav
 
 	#
 	# Vehicle Control
 	#
-	modules/fw_att_control
-	modules/fw_pos_control_l1
-	modules/mc_att_control
-	modules/mc_pos_control
-	modules/vtol_att_control
+  #modules/fw_att_control
+  #modules/fw_pos_control_l1
+  #modules/mc_att_control
+  #modules/mc_pos_control
+  #modules/vtol_att_control
 
 	#
 	# Logging
@@ -160,12 +160,12 @@ set(config_module_list
 	#
 	# OBC challenge
 	#
-	modules/bottle_drop
+  #modules/bottle_drop
 
 	#
 	# Rover apps
 	#
-	examples/rover_steering_control
+  #examples/rover_steering_control
 
 	#
 	# Demo apps
@@ -173,7 +173,7 @@ set(config_module_list
 	#examples/math_demo
 	# Tutorial code from
 	# https://px4.io/dev/px4_simple_app
-	examples/px4_simple_app
+  #examples/px4_simple_app
 
 	# Tutorial code from
 	# https://px4.io/dev/daemon
@@ -191,7 +191,13 @@ set(config_module_list
 	#examples/hwtest
 
 	# EKF
-	examples/ekf_att_pos_estimator
+  #examples/ekf_att_pos_estimator
+
+  # MORUS modules
+  morus_modules/morus_uavcan_px4
+  morus_modules/morus_px4_controller_commander
+  morus_modules/morus_attitude_control
+  morus_modules/morus_position_control
 )
 
 set(config_extra_builtin_cmds

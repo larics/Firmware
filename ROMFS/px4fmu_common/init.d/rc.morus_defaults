@@ -1,0 +1,4 @@
+#!nsh
+
+set VEHICLE_TYPE mc
+

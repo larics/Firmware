@@ -1,0 +1,26 @@
+#!nsh
+#
+# Apps for morus multirotors:
+# att & pos estimator, att & pos control.
+#
+
+
+#---------------------------------------
+# Estimator group selction
+#
+ekf2 start
+
+#---------------------------------------
+
+# UAVCAN module
+morus_uavcan_px4 start
+
+# controller commander
+morus_px4_controller_commander start
+
+# attitude controller
+morus_attitude_controller start
+
+# position controller
+morus_position_controller start
+
