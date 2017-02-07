@@ -89,7 +89,7 @@ set(config_module_list
   #modules/mc_pos_control/mc_pos_control_tests
 	modules/unit_test
 	modules/uORB/uORB_tests
-	systemcmds/tests
+  #systemcmds/tests
 
 	#
 	# General system control
