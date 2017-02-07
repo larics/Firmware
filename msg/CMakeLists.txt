@@ -125,17 +125,20 @@ set(msg_file_names
 	mount_orientation.msg
 	collision_report.msg
 	low_stack.msg
+
+	########## MORUS ###########
 	morus/controllers_switch.msg
 	morus/controllers_reference.msg
 	morus/attitude_controller_reference.msg
-  morus/controllers_mode.msg
-  morus/position_controller_setpoint.msg
+	morus/controllers_mode.msg
+	morus/position_controller_setpoint.msg
 	morus/gas_motor_status.msg
 	morus/moving_mass_status.msg
 	morus/arm_control_unit_power_status.msg
-  morus/gas_motor_ignition_reference.msg
-  morus/moving_mass_setpoint.msg
-  morus/moving_mass_setpoint_array.msg
+	morus/gas_motor_ignition_reference.msg
+	morus/moving_mass_setpoint.msg
+	morus/moving_mass_setpoint_array.msg
+	morus/gas_motor_setpoint.msg
 	)
 
 # Get absolute paths
