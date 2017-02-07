@@ -83,22 +83,22 @@ set(config_module_list
 	drivers/sf0x/sf0x_tests
 	drivers/test_ppm
 	#lib/rc/rc_tests
-	modules/commander/commander_tests
-	modules/controllib_test
-	modules/mavlink/mavlink_tests
-	modules/mc_pos_control/mc_pos_control_tests
+  modules/commander/commander_tests
+  #modules/controllib_test
+  #modules/mavlink/mavlink_tests
+  #modules/mc_pos_control/mc_pos_control_tests
 	modules/unit_test
 	modules/uORB/uORB_tests
-	systemcmds/tests
+  #systemcmds/tests
 
 	#
 	# General system control
 	#
 	modules/commander
 	modules/gpio_led
-	modules/land_detector
-	modules/load_mon
-	modules/mavlink
+  #modules/land_detector
+  modules/load_mon
+  #modules/mavlink
 	modules/navigator
   #modules/uavcan
 
