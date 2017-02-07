@@ -2,8 +2,6 @@
 # Add comment.
 #
 
-uint64 acu_can_timestamp	# can timestamp on acu
-
 float32 position		# measured position of moving mass [m]
 float32 speed			# measured speed of moving mass [m/s]
 
