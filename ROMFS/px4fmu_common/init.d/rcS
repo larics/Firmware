@@ -162,6 +162,16 @@ then
 		fi
 	fi
 
+
+	#
+	# Start morus modules
+	#
+
+	vcu_uavcan start
+	morus_controller_commander start
+	morus_position_control start
+	morus_attitude_control start
+
 	#
 	# Set default values
 	#
@@ -428,18 +438,6 @@ then
 	# Start CPU load monitor
 	#
 	load_mon start
-
-  #
-  # Start morus modules is start up script exists
-  #
-  # Start any custom addons
-  set MORUS_MODULES /fs/microsd/etc/MORUS_MODULES.txt
-  if [ -f $MORUS_MODULES ]
-  then
-    echo "Addons script: ${MORUS_MODULES}"
-    sh $MORUS_MODULES
-  fi
-  unset MORUS_MODULES
 
 	#
 	# Start primary output
