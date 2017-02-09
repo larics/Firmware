@@ -62,7 +62,7 @@ PARAM_DEFINE_INT32(CAL_GYRO0_ID, 2359584);
  * @max 10.0
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_GYRO0_XOFF, 0.0f);
+PARAM_DEFINE_FLOAT(CAL_GYRO0_XOFF, 0.004098414909094572f);
 
 /**
  * Gyro Y-axis offset
@@ -71,7 +71,7 @@ PARAM_DEFINE_FLOAT(CAL_GYRO0_XOFF, 0.0f);
  * @max 10.0
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_GYRO0_YOFF, 0.0f);
+PARAM_DEFINE_FLOAT(CAL_GYRO0_YOFF, 0.017780164256691933f);
 
 /**
  * Gyro Z-axis offset
@@ -80,7 +80,7 @@ PARAM_DEFINE_FLOAT(CAL_GYRO0_YOFF, 0.0f);
  * @max 5.0
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_GYRO0_ZOFF, 0.0f);
+PARAM_DEFINE_FLOAT(CAL_GYRO0_ZOFF, -0.005232565104961395f);
 
 /**
  * Gyro X-axis scaling factor
@@ -114,7 +114,7 @@ PARAM_DEFINE_FLOAT(CAL_GYRO0_ZSCALE, 1.0f);
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_INT32(CAL_MAG0_ID, 262432);
+PARAM_DEFINE_INT32(CAL_MAG0_ID, 131594);
 
 /**
  * Rotation of magnetometer 0 relative to airframe.
@@ -164,7 +164,7 @@ PARAM_DEFINE_INT32(CAL_MAG0_ROT, -1);
  * @max 500.0
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_MAG0_XOFF, 0.0f);
+PARAM_DEFINE_FLOAT(CAL_MAG0_XOFF, -0.040143642574548721f);
 
 /**
  * Magnetometer Y-axis offset
@@ -173,7 +173,7 @@ PARAM_DEFINE_FLOAT(CAL_MAG0_XOFF, 0.0f);
  * @max 500.0
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_MAG0_YOFF, 0.0f);
+PARAM_DEFINE_FLOAT(CAL_MAG0_YOFF, 0.315824389457702637f);
 
 /**
  * Magnetometer Z-axis offset
@@ -182,7 +182,7 @@ PARAM_DEFINE_FLOAT(CAL_MAG0_YOFF, 0.0f);
  * @max 500.0
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_MAG0_ZOFF, 0.0f);
+PARAM_DEFINE_FLOAT(CAL_MAG0_ZOFF, -0.009357240051031113f);
 
 /**
  * Magnetometer X-axis scaling factor
@@ -210,56 +210,56 @@ PARAM_DEFINE_FLOAT(CAL_MAG0_ZSCALE, 1.0f);
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_INT32(CAL_ACC0_ID, 1442080);
+PARAM_DEFINE_INT32(CAL_ACC0_ID, 1246218);
 
 /**
  * Accelerometer X-axis offset
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC0_XOFF, 0.0f);
+PARAM_DEFINE_FLOAT(CAL_ACC0_XOFF, 0.024202346801757812f);
 
 /**
  * Accelerometer Y-axis offset
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC0_YOFF, 0.0f);
+PARAM_DEFINE_FLOAT(CAL_ACC0_YOFF, -0.239821910858154297f);
 
 /**
  * Accelerometer Z-axis offset
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC0_ZOFF, 0.0f);
+PARAM_DEFINE_FLOAT(CAL_ACC0_ZOFF, 0.523274421691894531f);
 
 /**
  * Accelerometer X-axis scaling factor
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC0_XSCALE, 1.0f);
+PARAM_DEFINE_FLOAT(CAL_ACC0_XSCALE, 1.004246950149536133f);
 
 /**
  * Accelerometer Y-axis scaling factor
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC0_YSCALE, 1.0f);
+PARAM_DEFINE_FLOAT(CAL_ACC0_YSCALE, 0.998299121856689453f);
 
 /**
  * Accelerometer Z-axis scaling factor
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC0_ZSCALE, 1.0f);
+PARAM_DEFINE_FLOAT(CAL_ACC0_ZSCALE, 0.990035891532897949f);
 
 /**
  * ID of the Gyro that the calibration is for.
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_INT32(CAL_GYRO1_ID, 2229282);
+PARAM_DEFINE_INT32(CAL_GYRO1_ID, 2228490);
 
 /**
  * Gyro X-axis offset
@@ -268,7 +268,7 @@ PARAM_DEFINE_INT32(CAL_GYRO1_ID, 2229282);
  * @max 10.0
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_GYRO1_XOFF, -0.032485101372003555f);
+PARAM_DEFINE_FLOAT(CAL_GYRO1_XOFF, -0.033505551517009735f);
 
 /**
  * Gyro Y-axis offset
@@ -277,7 +277,7 @@ PARAM_DEFINE_FLOAT(CAL_GYRO1_XOFF, -0.032485101372003555f);
  * @max 10.0
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_GYRO1_YOFF, -0.008368869312107563f);
+PARAM_DEFINE_FLOAT(CAL_GYRO1_YOFF, -0.040108535438776016f);
 
 /**
  * Gyro Z-axis offset
@@ -286,7 +286,7 @@ PARAM_DEFINE_FLOAT(CAL_GYRO1_YOFF, -0.008368869312107563f);
  * @max 5.0
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_GYRO1_ZOFF, -0.003329226747155190f);
+PARAM_DEFINE_FLOAT(CAL_GYRO1_ZOFF, 0.040176827460527420f);
 
 /**
  * Gyro X-axis scaling factor
@@ -320,7 +320,7 @@ PARAM_DEFINE_FLOAT(CAL_GYRO1_ZSCALE, 1.000000000000000000f);
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_INT32(CAL_MAG1_ID, 131874);
+PARAM_DEFINE_INT32(CAL_MAG1_ID, 0);
 
 /**
  * Rotation of magnetometer 1 relative to airframe.
@@ -416,49 +416,49 @@ PARAM_DEFINE_FLOAT(CAL_MAG1_ZSCALE, 1.000000000000000000f);
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_INT32(CAL_ACC1_ID, 1114914);
+PARAM_DEFINE_INT32(CAL_ACC1_ID, 1114634);
 
 /**
  * Accelerometer X-axis offset
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC1_XOFF, 0.946044445037841797f);
+PARAM_DEFINE_FLOAT(CAL_ACC1_XOFF, 1.068432807922363281f);
 
 /**
  * Accelerometer Y-axis offset
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC1_YOFF, -1.090429306030273438f);
+PARAM_DEFINE_FLOAT(CAL_ACC1_YOFF, 1.185729026794433594f);
 
 /**
  * Accelerometer Z-axis offset
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC1_ZOFF, 0.601058483123779297f);
+PARAM_DEFINE_FLOAT(CAL_ACC1_ZOFF, 1.426436901092529297f);
 
 /**
  * Accelerometer X-axis scaling factor
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC1_XSCALE, 1.004625320434570312f);
+PARAM_DEFINE_FLOAT(CAL_ACC1_XSCALE, 1.005313992500305176f);
 
 /**
  * Accelerometer Y-axis scaling factor
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC1_YSCALE, 1.037691354751586914f);
+PARAM_DEFINE_FLOAT(CAL_ACC1_YSCALE, 0.994388282299041748f);
 
 /**
  * Accelerometer Z-axis scaling factor
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(CAL_ACC1_ZSCALE, 1.016288518905639648f);
+PARAM_DEFINE_FLOAT(CAL_ACC1_ZSCALE, 1.000818490982055664f);
 
 /**
  * ID of the Gyro that the calibration is for.
@@ -526,7 +526,7 @@ PARAM_DEFINE_FLOAT(CAL_GYRO2_ZSCALE, 1.000000000000000000f);
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_INT32(CAL_MAG2_ID, 263176);
+PARAM_DEFINE_INT32(CAL_MAG2_ID, 0);
 
 /**
  * Rotation of magnetometer 2 relative to airframe.
@@ -671,21 +671,21 @@ PARAM_DEFINE_FLOAT(CAL_ACC2_ZSCALE, 1.016288518905639648f);
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_INT32(CAL_ACC_PRIME, 1442824);
+PARAM_DEFINE_INT32(CAL_ACC_PRIME, 1246218);
 
 /**
  * Primary gyro ID
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_INT32(CAL_GYRO_PRIME, 0);
+PARAM_DEFINE_INT32(CAL_GYRO_PRIME, 2162688);
 
 /**
  * Primary mag ID
  *
  * @group Sensor Calibration
  */
-PARAM_DEFINE_INT32(CAL_MAG_PRIME, 262432);
+PARAM_DEFINE_INT32(CAL_MAG_PRIME, 131594);
 
 /**
  * Bitfield selecting mag sides for calibration
@@ -814,7 +814,7 @@ PARAM_DEFINE_INT32(SENS_FLOW_ROT, 6);
  * @unit deg
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(SENS_BOARD_Y_OFF, -0.651336967945098877f);
+PARAM_DEFINE_FLOAT(SENS_BOARD_Y_OFF, -0.200958564877510071f);
 
 /**
  * Board rotation X (Roll) offset
@@ -825,7 +825,7 @@ PARAM_DEFINE_FLOAT(SENS_BOARD_Y_OFF, -0.651336967945098877f);
  * @unit deg
  * @group Sensor Calibration
  */
-PARAM_DEFINE_FLOAT(SENS_BOARD_X_OFF, -1.178467035293579102f);
+PARAM_DEFINE_FLOAT(SENS_BOARD_X_OFF, -0.313891857862472534f);
 
 /**
  * Board rotation Z (YAW) offset
