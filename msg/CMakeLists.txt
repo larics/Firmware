@@ -140,6 +140,8 @@ set(msg_file_names
 	morus/moving_mass_setpoint_array.msg
 	morus/gas_motor_setpoint.msg
 	morus/gas_motor_setpoint_array.msg
+  pid_status.msg
+  morus/attitude_controller_status.msg
 	)
 
 # Get absolute paths
