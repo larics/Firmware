@@ -139,6 +139,9 @@ set(msg_file_names
 	morus/moving_mass_setpoint.msg
 	morus/moving_mass_setpoint_array.msg
 	morus/gas_motor_setpoint.msg
+	morus/flags_v_communication_timeout.msg
+	morus/flags_v_value_out_of_range.msg
+	morus/flags_v_values_dont_change_timeout.msg
 	)
 
 # Get absolute paths
