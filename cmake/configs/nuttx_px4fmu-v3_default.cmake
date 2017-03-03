@@ -199,6 +199,7 @@ set(config_module_list
   morus_modules/morus_px4_controller_commander
   morus_modules/morus_attitude_control
   morus_modules/morus_position_control
+  morus_modules/morus_uav_low_level_sm
 )
 
 set(config_extra_builtin_cmds
