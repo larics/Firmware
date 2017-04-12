@@ -113,11 +113,11 @@ set(config_module_list
 	#
 	# Vehicle Control
 	#
-	#modules/fw_att_control
-	#modules/fw_pos_control_l1
-	#modules/mc_att_control
-	#modules/mc_pos_control
-	#modules/vtol_att_control
+	modules/fw_att_control
+	modules/fw_pos_control_l1
+	modules/mc_att_control
+	modules/mc_pos_control
+	modules/vtol_att_control
 
 	#
 	# Logging
