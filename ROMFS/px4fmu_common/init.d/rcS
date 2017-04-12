@@ -171,7 +171,7 @@ then
 	morus_controller_commander start
 	morus_position_control start
 	morus_attitude_control start
-	ekf2
+	ekf2 start
 
 	#
 	# Set default values
