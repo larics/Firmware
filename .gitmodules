@@ -60,3 +60,6 @@
 [submodule "src/morus_modules/morus_mmc_vpc_attitude_control"]
 	path = src/morus_modules/morus_mmc_vpc_attitude_control
 	url = git@github.com:larics/morus_attitude_control.git
+[submodule "src/morus_modules/morus_rotors_variation_attitude_control"]
+	path = src/morus_modules/morus_rotors_variation_attitude_control
+	url = git@github.com:larics/morus_attitude_control.git
