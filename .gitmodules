@@ -48,9 +48,6 @@
 [submodule "src/morus_lib/pid"]
 	path = src/morus_lib/pid
 	url = git@github.com:larics/pid.git
-[submodule "src/morus_modules/morus_attitude_control"]
-	path = src/morus_modules/morus_attitude_control
-	url = git@github.com:larics/morus_attitude_control.git
 [submodule "src/morus_modules/morus_position_control"]
 	path = src/morus_modules/morus_position_control
 	url = git@github.com:larics/morus_position_control.git
