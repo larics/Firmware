@@ -57,3 +57,6 @@
 [submodule "src/morus_modules/morus_uav_low_level_sm"]
 	path = src/morus_modules/morus_uav_low_level_sm
 	url = git@github.com:larics/morus_uav_low_level_sm.git
+[submodule "src/morus_modules/morus_mmc_vpc_attitude_control"]
+	path = src/morus_modules/morus_mmc_vpc_attitude_control
+	url = git@github.com:larics/morus_attitude_control.git
