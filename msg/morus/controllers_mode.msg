@@ -17,6 +17,9 @@ bool controller_velocity_x          # values AUTO or MAN
 bool controller_velocity_y          # values AUTO or MAN
 bool controller_velocity_z          # values AUTO or MAN
 
+
+bool controller_roll                # values AUTO or MAN
+bool controller_pitch               # values AUTO or MAN
 bool controller_yaw                 # values AUTO or MAN
 bool controller_yaw_rate            # values AUTO or MAN
 
