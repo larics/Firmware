@@ -113,6 +113,13 @@
 #include <uORB/topics/cpuload.h>
 #include <uORB/topics/low_stack.h>
 
+// Adding additional topics
+// *************************************
+
+#include <uORB/topics/controllers_reference.h>
+
+// *************************************
+
 #include <systemlib/systemlib.h>
 #include <systemlib/param/param.h>
 #include <systemlib/perf_counter.h>
@@ -1214,6 +1221,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 		struct cpuload_s cpuload;
 		struct vehicle_gps_position_s dual_gps_pos;
 		struct low_stack_s low_stack;
+		
+		// Added controllers reference to buffer
+		struct controllers_reference_s controllers_reference;
 	} buf;
 
 	memset(&buf, 0, sizeof(buf));
@@ -1277,6 +1287,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_LOAD_s log_LOAD;
 			struct log_DPRS_s log_DPRS;
 			struct log_STCK_s log_STCK;
+
+			// Add controller reference to message body
+			struct log_CREF_s log_CREF;
 		} body;
 	} log_msg = {
 		LOG_PACKET_HEADER_INIT(0)
@@ -1328,6 +1341,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int cpuload_sub;
 		int diff_pres_sub;
 		int low_stack_sub;
+
+		// Add controller reference to sub
+		int cref_sub;
 	} subs;
 
 	subs.cmd_sub = -1;
@@ -1372,7 +1388,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.cpuload_sub = -1;
 	subs.diff_pres_sub = -1;
 	subs.low_stack_sub = -1;
-
+	subs.cref_sub = -1;
+	
+	//TODO topics
 	/* add new topics HERE */
 
 
@@ -1410,6 +1428,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 	/* running, report */
 	thread_running = true;
 
+	//TODO fds
 	// wakeup source
 	px4_pollfd_struct_t fds[2];
 	unsigned px4_pollfd_len = 0;
@@ -2272,7 +2291,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 				log_msg.body.log_CTS.yaw_rate = buf.ctrl_state.yaw_rate;
 				LOGBUFFER_WRITE_AND_COUNT(CTS);
 			}
-		}
+
+		} // if log type all or normal
 
 		/* --- ATTITUDE --- */
 		if (copy_if_updated(ORB_ID(vehicle_attitude), &subs.att_sub, &buf.att)) {
@@ -2323,6 +2343,33 @@ int sdlog2_thread_main(int argc, char *argv[])
 			strncpy(log_msg.body.log_STCK.task_name, (char*)buf.low_stack.task_name, sizeof(log_msg.body.log_STCK.task_name));
 			LOGBUFFER_WRITE_AND_COUNT(STCK);
 		}
+
+		/* --- CONTROLLER REFERENCE --- */
+		if (copy_if_updated(ORB_ID(controllers_reference), &subs.cref_sub, &buf.controllers_reference)) {
+			log_msg.msg_type = LOG_CREF_MSG;
+
+			// Position 
+			log_msg.body.log_CREF.x = buf.controllers_reference.x;
+			log_msg.body.log_CREF.y = buf.controllers_reference.y;
+			log_msg.body.log_CREF.z = buf.controllers_reference.z;
+			
+			// Velocity
+			log_msg.body.log_CREF.vx = buf.controllers_reference.vx;
+			log_msg.body.log_CREF.vy = buf.controllers_reference.vy;
+			log_msg.body.log_CREF.vz = buf.controllers_reference.vz;
+
+
+			log_msg.body.log_CREF.yaw = buf.controllers_reference.yaw;
+			log_msg.body.log_CREF.vyaw = buf.controllers_reference.vyaw;
+			log_msg.body.log_CREF.yaw_manual_rpm = buf.controllers_reference.yaw_manual_rpm;
+			
+			log_msg.body.log_CREF.roll = buf.controllers_reference.roll;
+			log_msg.body.log_CREF.pitch = buf.controllers_reference.pitch;
+			log_msg.body.log_CREF.throttle = buf.controllers_reference.throttle;
+
+			LOGBUFFER_WRITE_AND_COUNT(CREF)				
+		}
+
 
 		pthread_mutex_lock(&logbuffer_mutex);
 
