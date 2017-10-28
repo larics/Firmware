@@ -197,8 +197,8 @@ set(config_module_list
   morus_lib/pid
   morus_modules/morus_uavcan_px4
   morus_modules/morus_px4_controller_commander
-  morus_modules/morus_mmc_vpc_attitude_control
-  morus_modules/morus_rotors_variation_attitude_control
+  morus_modules/mv
+  morus_modules/rv
   morus_modules/morus_position_control
   morus_modules/morus_uav_low_level_sm
 )
