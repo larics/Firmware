@@ -6,7 +6,24 @@ set(CMAKE_TOOLCHAIN_FILE ${PX4_SOURCE_DIR}/cmake/toolchains/Toolchain-arm-none-e
 
 set(config_uavcan_num_ifaces 2)
 
+#*****************************************************************************
+# Library used for parsing xml files
+#
+
+include(ExternalProject)
+ExternalProject_Add(
+  expat
+  SOURCE_DIR ${PX4_SOURCE_DIR}/src/lib/expat-2.2.4
+  CONFIGURE_COMMAND ${PX4_SOURCE_DIR}/src/lib/expat-2.2.4/configure --prefix=${PX4_SOURCE_DIR}/src/lib/expat-2.2.4
+  PREFIX ${PX4_SOURCE_DIR}/src/lib/expat-2.2.4
+  BUILD_COMMAND make install
+  BUILD_IN_SOURCE 1
+)
+
+#*****************************************************************************
+
 set(config_module_list
+
 	#
 	# Board support modules
 	#
@@ -123,6 +140,7 @@ set(config_module_list
 	# Logging
 	#
 	modules/logger
+	#modules/log_filter
 	modules/sdlog2
 
 	#
@@ -151,6 +169,8 @@ set(config_module_list
 	lib/tailsitter_recovery
 	lib/terrain_estimation
 	lib/version
+	lib/c_hashmap
+
 	platforms/nuttx
 
 	# had to add for cmake, not sure why wasn't in original config
@@ -174,7 +194,9 @@ set(config_module_list
 	# Tutorial code from
 	# https://px4.io/dev/px4_simple_app
     examples/px4_simple_app
-
+    
+    
+    
 	# Tutorial code from
 	# https://px4.io/dev/daemon
 	#examples/px4_daemon_app
@@ -233,3 +255,5 @@ set_target_properties(serdis PROPERTIES
 	MAIN "serdis"
 	STACK_MAIN "2048"
 	COMPILE_FLAGS "-Os")
+
+

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmodules__dataman.a  CMakeFiles/modules__dataman.dir/dataman.c.o
+/usr/bin/ranlib libmodules__dataman.a

@@ -1,0 +1,1 @@
+cmd='/home/lmark/src/px4-firmware/src/lib/expat-2.2.4/configure;--prefix=/home/lmark/src/px4-firmware/src/lib/expat-2.2.4'

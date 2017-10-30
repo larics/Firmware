@@ -1,0 +1,8 @@
+codepage.o: codepage.c /usr/include/stdc-predef.h codepage.h \
+ ../lib/internal.h
+
+/usr/include/stdc-predef.h:
+
+codepage.h:
+
+../lib/internal.h:

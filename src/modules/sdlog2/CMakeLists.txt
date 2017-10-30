@@ -41,7 +41,11 @@ px4_add_module(
 	SRCS
 		sdlog2.c
 		logbuffer.c
+		log_filter.c
 	DEPENDS
 		platforms__common
 	)
+
+#target_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/log_filter.c ${PX4_SOURCE_DIR}/src/lib/expat-2.2.4/lib/expat-2.2.4.a)
+
 # vim: set noet ft=cmake fenc=utf-8 ff=unix :

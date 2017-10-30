@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblib__tailsitter_recovery.a  CMakeFiles/lib__tailsitter_recovery.dir/tailsitter_recovery.cpp.o
+/usr/bin/ranlib liblib__tailsitter_recovery.a

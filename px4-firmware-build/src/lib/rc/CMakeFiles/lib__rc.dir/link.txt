@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblib__rc.a  CMakeFiles/lib__rc.dir/st24.c.o CMakeFiles/lib__rc.dir/sumd.c.o CMakeFiles/lib__rc.dir/sbus.c.o CMakeFiles/lib__rc.dir/dsm.c.o
+/usr/bin/ranlib liblib__rc.a

@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblib__runway_takeoff.a  CMakeFiles/lib__runway_takeoff.dir/RunwayTakeoff.cpp.o
+/usr/bin/ranlib liblib__runway_takeoff.a
