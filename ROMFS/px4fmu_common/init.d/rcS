@@ -170,7 +170,8 @@ then
 	vcu_uavcan start
 	morus_controller_commander start
 	morus_position_control start
-	morus_mmc_vpc_attitude_control start
+	#morus_mmc_vpc_attitude_control start
+	rv
 	ekf2 start
 
 	#
