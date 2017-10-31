@@ -39,7 +39,7 @@ parse_xml(char *buff, size_t buff_size)
 {
     FILE *fid;
 
-    fid = fopen(PATH_TO_FILE, "r");
+    fid = fopen(PATH_TO_FILE, "r+");
     if (fid == NULL) {
         return -1;
     }
@@ -53,16 +53,15 @@ parse_xml(char *buff, size_t buff_size)
             continue;
         }
 
-        data_struct_t* new_value = malloc(sizeof(data_struct_t));
-
-        snprintf(new_value->key_string, KEY_MAX_LENGTH, "%s", str1);
-
-        if (strcmp(str2, "true") == 0) {
-            new_value->enabled = 1;
-        } else {
-            new_value->enabled = 0;
+        if (strcmp(str2, "true") != 0) {
+            continue;
         }
 
+        // Add to map only if true
+        data_struct_t* new_value = malloc(sizeof(data_struct_t));
+        snprintf(new_value->key_string, KEY_MAX_LENGTH, "%s", str1);
+        new_value->enabled = 1;
+    
         // Try to put value in the map
         if (hashmap_put(topic_map, new_value->key_string, new_value) != MAP_OK) {
             return -2;

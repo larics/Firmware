@@ -220,8 +220,10 @@ static bool sess_folder_created = false;
 /* Variable used for reading topic map */
 static data_struct_t* map_value;
 
-/* Flag for topic map initialization. */
-static bool topic_map_initialized;
+/* Flag for topic map initialization. 
+ * Set to true when sdlo2 is started for the first time in a session. 
+ */
+static bool topic_map_initialized = false;
 
 /**
  * Log buffer writing thread. Open and close file here.
@@ -813,9 +815,6 @@ void sdlog2_stop_log()
 	if (!logging_enabled) {
 		return;
 	}
-
-	// Disable configureatin file initialization
-	topic_map_initialized = false;
 
 	/* disabling the logging will trigger the skipped count to increase,
 	 * so we take a local copy before interrupting the disk I/O.
@@ -1505,23 +1504,27 @@ int sdlog2_thread_main(int argc, char *argv[])
 	// Initialize topic map
 	// *****************************************************************
 	#ifdef __LOG_FILTER_H
-		int result = initialize_topic_map();
-		
-		if (result >= 0) {
-			PX4_WARN("sdlog2 configuration initialized.");
-			topic_map_initialized = true;
-
-		} else if (result == -1) {
-			PX4_WARN("Unable to find configuration file. Should be in /fs/microsd/log/sdlog2_config.txt");
-			topic_map_initialized = false;
-
-		} else if (result == -2) {
-			PX4_WARN("Unable to initialize all topic configurations.");
-			topic_map_initialized = false;
-
+		if (topic_map_initialized) {
+			PX4_WARN("sdlog2 configuration already initialized.");
 		} else {
-			PX4_WARN("Sdlog2 configuration - unknown error occured.");
-			topic_map_initialized = false;
+			int result = initialize_topic_map();
+			
+			if (result >= 0) {
+				PX4_WARN("sdlog2 configuration initialized.");
+				topic_map_initialized = true;
+
+			} else if (result == -1) {
+				PX4_WARN("Unable to find configuration file. Should be in /fs/microsd/log/sdlog2_config.txt");
+				topic_map_initialized = false;
+
+			} else if (result == -2) {
+				PX4_WARN("Unable to initialize all topic configurations.");
+				topic_map_initialized = false;
+
+			} else {
+				PX4_WARN("Sdlog2 configuration - unknown error occured.");
+				topic_map_initialized = false;
+			}
 		}
 	#endif
 	// *****************************************************************
@@ -2579,13 +2582,18 @@ void handle_status(struct vehicle_status_s *status)
 }
 
 
-static bool check_sdlog2_configuration(char* str) {
+bool check_sdlog2_configuration(char* str) {
 	
-	bool flag = topic_map_initialized && 
-		(hashmap_get(topic_map, str, (void**)&map_value) == MAP_OK) && 
+	// If topic map is not initialized enable by default
+	if (!topic_map_initialized) {
+		return true;
+	}
+
+	// Get the value and see if it's enabled
+	int error = hashmap_get(topic_map, str, (void**)&map_value);
+	bool flag = (error == MAP_OK) && 
 		(map_value->enabled == 1); 
 
-	free(map_value);
-
+	//printf("%s %d %d\n", str, error, map_value->enabled);
 	return flag;
 }

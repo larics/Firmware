@@ -15,7 +15,7 @@
  */
 #define KEY_MAX_LENGTH (64)
 #define KEY_PREFIX ("somekey")
-#define KEY_COUNT (128)
+#define KEY_COUNT (32)
 
 /**
  * Path to the log configuration file.
