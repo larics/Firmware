@@ -31,21 +31,10 @@
 #
 ############################################################################
 px4_add_module(
-	MODULE modules__sdlog2
-	MAIN sdlog2
-	PRIORITY "SCHED_PRIORITY_MAX-30"
-	STACK_MAIN 1200
-	STACK_MAX 1600
+	MODULE lib__c_hashmap
 	COMPILE_FLAGS
-		${MODULE_CFLAGS}
 	SRCS
-		sdlog2.c
-		logbuffer.c
-		log_filter.c
+		hashmap.c
 	DEPENDS
 		platforms__common
 	)
-
-#target_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/log_filter.c ${PX4_SOURCE_DIR}/src/lib/expat-2.2.4/lib/expat-2.2.4.a)
-
-# vim: set noet ft=cmake fenc=utf-8 ff=unix :

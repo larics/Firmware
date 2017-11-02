@@ -113,6 +113,13 @@
 #include <uORB/topics/cpuload.h>
 #include <uORB/topics/low_stack.h>
 
+// Adding additional topics
+// *************************************
+
+#include <uORB/topics/controllers_reference.h>
+
+// *************************************
+
 #include <systemlib/systemlib.h>
 #include <systemlib/param/param.h>
 #include <systemlib/perf_counter.h>
@@ -123,6 +130,7 @@
 #include "logbuffer.h"
 #include "sdlog2_format.h"
 #include "sdlog2_messages.h"
+#include "log_filter.h"
 
 #define PX4_EPOCH_SECS 1234567890L
 
@@ -209,6 +217,14 @@ static perf_counter_t perf_write;
  * we don't want to create yet another one. */
 static bool sess_folder_created = false;
 
+/* Variable used for reading topic map */
+static data_struct_t* map_value;
+
+/* Flag for topic map initialization. 
+ * Set to true when sdlo2 is started for the first time in a session. 
+ */
+static bool topic_map_initialized = false;
+
 /**
  * Log buffer writing thread. Open and close file here.
  */
@@ -290,6 +306,12 @@ static int open_log_file(void);
 
 static int open_perf_file(const char* str);
 
+/*
+ * Check if configuration file is loaded and
+ * if given topic name is enabled.
+ */
+static bool check_sdlog2_configuration(char* str);
+
 static void
 sdlog2_usage(const char *reason)
 {
@@ -352,6 +374,8 @@ int sdlog2_main(int argc, char *argv[])
 		}
 
 		main_thread_should_exit = false;
+
+		
 		deamon_task = px4_task_spawn_cmd("sdlog2",
 						 SCHED_DEFAULT,
 						 task_priority,
@@ -1214,6 +1238,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 		struct cpuload_s cpuload;
 		struct vehicle_gps_position_s dual_gps_pos;
 		struct low_stack_s low_stack;
+		
+		// Added controllers reference to buffer
+		struct controllers_reference_s controllers_reference;
 	} buf;
 
 	memset(&buf, 0, sizeof(buf));
@@ -1277,6 +1304,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_LOAD_s log_LOAD;
 			struct log_DPRS_s log_DPRS;
 			struct log_STCK_s log_STCK;
+
+			// Add controller reference to message body
+			struct log_CREF_s log_CREF;
 		} body;
 	} log_msg = {
 		LOG_PACKET_HEADER_INIT(0)
@@ -1328,6 +1358,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int cpuload_sub;
 		int diff_pres_sub;
 		int low_stack_sub;
+
+		// Add controller reference to sub
+		int cref_sub;
 	} subs;
 
 	subs.cmd_sub = -1;
@@ -1372,7 +1405,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.cpuload_sub = -1;
 	subs.diff_pres_sub = -1;
 	subs.low_stack_sub = -1;
-
+	subs.cref_sub = -1;
+	
+	//TODO topics
 	/* add new topics HERE */
 
 
@@ -1410,6 +1445,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 	/* running, report */
 	thread_running = true;
 
+	//TODO fds
 	// wakeup source
 	px4_pollfd_struct_t fds[2];
 	unsigned px4_pollfd_len = 0;
@@ -1465,6 +1501,34 @@ int sdlog2_thread_main(int argc, char *argv[])
 	}
 
 
+	// Initialize topic map
+	// *****************************************************************
+	#ifdef __LOG_FILTER_H
+		if (topic_map_initialized) {
+			PX4_WARN("sdlog2 configuration already initialized.");
+		} else {
+			int result = initialize_topic_map();
+			
+			if (result >= 0) {
+				PX4_WARN("sdlog2 configuration initialized.");
+				topic_map_initialized = true;
+
+			} else if (result == -1) {
+				PX4_WARN("Unable to find configuration file. Should be in /fs/microsd/log/sdlog2_config.txt");
+				topic_map_initialized = false;
+
+			} else if (result == -2) {
+				PX4_WARN("Unable to initialize all topic configurations.");
+				topic_map_initialized = false;
+
+			} else {
+				PX4_WARN("Sdlog2 configuration - unknown error occured.");
+				topic_map_initialized = false;
+			}
+		}
+	#endif
+	// *****************************************************************
+		
 	while (!main_thread_should_exit) {
 
 		/* Check below's topics first even if logging is not enabled.
@@ -1498,6 +1562,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 			continue;
 		}
 
+		// TODO poll sleep timer
 		// wait for up to 100ms for data
 		int pret = px4_poll(&fds[0], px4_pollfd_len, 100);
 
@@ -1556,7 +1621,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 				&buf_commander_state);
 
 		/* --- VEHICLE STATUS --- */
-		if (status_updated) {
+		if (check_sdlog2_configuration("commander_state") && status_updated) {
 			log_msg.msg_type = LOG_STAT_MSG;
 			log_msg.body.log_STAT.main_state = buf_commander_state.main_state;
 			log_msg.body.log_STAT.nav_state = buf_status.nav_state;
@@ -1567,7 +1632,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		}
 
 		/* --- EKF2 REPLAY --- */
-		if (log_type == LOG_TYPE_ALL || log_type == LOG_TYPE_REPLAY_ONLY) {
+		if (false && (log_type == LOG_TYPE_ALL || log_type == LOG_TYPE_REPLAY_ONLY)) {
 
 			bool replay_updated = false;
 
@@ -1585,7 +1650,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 				}
 			}
 
-			if (replay_updated) {
+			if (check_sdlog2_configuration("ekf2_replay") && replay_updated) {
 				log_msg.msg_type = LOG_RPL1_MSG;
 				log_msg.body.log_RPL1.time_ref = buf.replay.time_ref;
 				log_msg.body.log_RPL1.gyro_integral_dt = buf.replay.gyro_integral_dt;
@@ -1697,7 +1762,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 					write_SENS = true;
 				}
 
-				if (write_IMU) {
+				if (check_sdlog2_configuration("imu") && write_IMU) {
 					log_msg.msg_type = LOG_IMU_MSG;
 
 					log_msg.body.log_IMU.gyro_x = buf.sensor.gyro_rad[0];
@@ -1715,7 +1780,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 					LOGBUFFER_WRITE_AND_COUNT(IMU);
 				}
 
-				if (write_SENS) {
+				if (check_sdlog2_configuration("sensor_combined") && write_SENS) {
 					log_msg.msg_type = LOG_SENS_MSG;
 
 					log_msg.body.log_SENS.baro_pres = 0;
@@ -1726,7 +1791,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- VTOL VEHICLE STATUS --- */
-			if(copy_if_updated(ORB_ID(vtol_vehicle_status), &subs.vtol_status_sub, &buf.vtol_status)) {
+			if(check_sdlog2_configuration("vtol_vehicle_status") && 
+				copy_if_updated(ORB_ID(vtol_vehicle_status), &subs.vtol_status_sub, &buf.vtol_status)) {
 				log_msg.msg_type = LOG_VTOL_MSG;
 				log_msg.body.log_VTOL.airspeed_tot = buf.vtol_status.airspeed_tot;
 				log_msg.body.log_VTOL.rw_mode = buf.vtol_status.vtol_in_rw_mode;
@@ -1736,7 +1802,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- GPS POSITION - UNIT #1 --- */
-			if (gps_pos_updated) {
+			if (check_sdlog2_configuration("vehicle_gps_position") && 
+				gps_pos_updated) {
 
 				log_msg.msg_type = LOG_GPS_MSG;
 				log_msg.body.log_GPS.gps_time = buf_gps_pos.time_utc_usec;
@@ -1758,7 +1825,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- GPS POSITION - UNIT #2 --- */
-			if (copy_if_updated_multi(ORB_ID(vehicle_gps_position), 1, &subs.gps_pos_sub[1], &buf.dual_gps_pos)) {
+			if (check_sdlog2_configuration("vehicle_gps_position") && 
+				copy_if_updated_multi(ORB_ID(vehicle_gps_position), 1, &subs.gps_pos_sub[1], &buf.dual_gps_pos)) {
 				log_msg.msg_type = LOG_DGPS_MSG;
 				log_msg.body.log_GPS.gps_time = buf.dual_gps_pos.time_utc_usec;
 				log_msg.body.log_GPS.fix_type = buf.dual_gps_pos.fix_type;
@@ -1781,7 +1849,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			/* --- SATELLITE INFO - UNIT #1 --- */
 			if (_extended_logging) {
 
-				if (copy_if_updated(ORB_ID(satellite_info), &subs.sat_info_sub, &buf.sat_info)) {
+				if (check_sdlog2_configuration("satellite_info") && 
+					copy_if_updated(ORB_ID(satellite_info), &subs.sat_info_sub, &buf.sat_info)) {
 
 					/* log the SNR of each satellite for a detailed view of signal quality */
 					unsigned sat_info_count = SDLOG_MIN(buf.sat_info.count, sizeof(buf.sat_info.snr) / sizeof(buf.sat_info.snr[0]));
@@ -1827,7 +1896,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- ATTITUDE SETPOINT --- */
-			if (copy_if_updated(ORB_ID(vehicle_attitude_setpoint), &subs.att_sp_sub, &buf.att_sp)) {
+			if (check_sdlog2_configuration("vehicle_attitude_setpoint") &&
+				copy_if_updated(ORB_ID(vehicle_attitude_setpoint), &subs.att_sp_sub, &buf.att_sp)) {
 				log_msg.msg_type = LOG_ATSP_MSG;
 				log_msg.body.log_ATSP.roll_sp = buf.att_sp.roll_body;
 				log_msg.body.log_ATSP.pitch_sp = buf.att_sp.pitch_body;
@@ -1841,7 +1911,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- RATES SETPOINT --- */
-			if (copy_if_updated(ORB_ID(vehicle_rates_setpoint), &subs.rates_sp_sub, &buf.rates_sp)) {
+			if (check_sdlog2_configuration("vehicle_rates_setpoint") && 
+				copy_if_updated(ORB_ID(vehicle_rates_setpoint), &subs.rates_sp_sub, &buf.rates_sp)) {
 				log_msg.msg_type = LOG_ARSP_MSG;
 				log_msg.body.log_ARSP.roll_rate_sp = buf.rates_sp.roll;
 				log_msg.body.log_ARSP.pitch_rate_sp = buf.rates_sp.pitch;
@@ -1850,20 +1921,23 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- ACTUATOR OUTPUTS --- */
-			if (copy_if_updated_multi(ORB_ID(actuator_outputs), 0, &subs.act_outputs_sub, &buf.act_outputs)) {
+			if (check_sdlog2_configuration("actuator_outputs") && 
+				copy_if_updated_multi(ORB_ID(actuator_outputs), 0, &subs.act_outputs_sub, &buf.act_outputs)) {
 				log_msg.msg_type = LOG_OUT0_MSG;
 				memcpy(log_msg.body.log_OUT.output, buf.act_outputs.output, sizeof(log_msg.body.log_OUT.output));
 				LOGBUFFER_WRITE_AND_COUNT(OUT);
 			}
 
-			if (copy_if_updated_multi(ORB_ID(actuator_outputs), 1, &subs.act_outputs_1_sub, &buf.act_outputs)) {
+			if (check_sdlog2_configuration("actuator_outputs") && 
+				copy_if_updated_multi(ORB_ID(actuator_outputs), 1, &subs.act_outputs_1_sub, &buf.act_outputs)) {
 				log_msg.msg_type = LOG_OUT1_MSG;
 				memcpy(log_msg.body.log_OUT.output, buf.act_outputs.output, sizeof(log_msg.body.log_OUT.output));
 				LOGBUFFER_WRITE_AND_COUNT(OUT);
 			}
 
 			/* --- ACTUATOR CONTROL --- */
-			if (copy_if_updated(ORB_ID_VEHICLE_ATTITUDE_CONTROLS, &subs.act_controls_sub, &buf.act_controls)) {
+			if (check_sdlog2_configuration("actuator_controls_0") && 
+				copy_if_updated(ORB_ID_VEHICLE_ATTITUDE_CONTROLS, &subs.act_controls_sub, &buf.act_controls)) {
 				log_msg.msg_type = LOG_ATTC_MSG;
 				log_msg.body.log_ATTC.roll = buf.act_controls.control[0];
 				log_msg.body.log_ATTC.pitch = buf.act_controls.control[1];
@@ -1873,7 +1947,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- ACTUATOR CONTROL FW VTOL --- */
-			if(copy_if_updated(ORB_ID(actuator_controls_1), &subs.act_controls_1_sub,&buf.act_controls)) {
+			if(check_sdlog2_configuration("actuator_controls_1") &&
+				copy_if_updated(ORB_ID(actuator_controls_1), &subs.act_controls_1_sub,&buf.act_controls)) {
 				log_msg.msg_type = LOG_ATC1_MSG;
 				log_msg.body.log_ATTC.roll = buf.act_controls.control[0];
 				log_msg.body.log_ATTC.pitch = buf.act_controls.control[1];
@@ -1883,7 +1958,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- LOCAL POSITION --- */
-			if (copy_if_updated(ORB_ID(vehicle_local_position), &subs.local_pos_sub, &buf.local_pos)) {
+			if (check_sdlog2_configuration("vehicle_local_position") && 
+				copy_if_updated(ORB_ID(vehicle_local_position), &subs.local_pos_sub, &buf.local_pos)) {
 				log_msg.msg_type = LOG_LPOS_MSG;
 				log_msg.body.log_LPOS.x = buf.local_pos.x;
 				log_msg.body.log_LPOS.y = buf.local_pos.y;
@@ -1909,7 +1985,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- LOCAL POSITION SETPOINT --- */
-			if (copy_if_updated(ORB_ID(vehicle_local_position_setpoint), &subs.local_pos_sp_sub, &buf.local_pos_sp)) {
+			if (check_sdlog2_configuration("vehicle_local_position_setpoint") && 
+				copy_if_updated(ORB_ID(vehicle_local_position_setpoint), &subs.local_pos_sp_sub, &buf.local_pos_sp)) {
 				log_msg.msg_type = LOG_LPSP_MSG;
 				log_msg.body.log_LPSP.x = buf.local_pos_sp.x;
 				log_msg.body.log_LPSP.y = buf.local_pos_sp.y;
@@ -1925,7 +2002,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- GLOBAL POSITION --- */
-			if (copy_if_updated(ORB_ID(vehicle_global_position), &subs.global_pos_sub, &buf.global_pos)) {
+			if (check_sdlog2_configuration("vehicle_global_position") && 
+				copy_if_updated(ORB_ID(vehicle_global_position), &subs.global_pos_sub, &buf.global_pos)) {
 				log_msg.msg_type = LOG_GPOS_MSG;
 				log_msg.body.log_GPOS.lat = buf.global_pos.lat * 1e7;
 				log_msg.body.log_GPOS.lon = buf.global_pos.lon * 1e7;
@@ -1944,7 +2022,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- BATTERY --- */
-			if (copy_if_updated(ORB_ID(battery_status), &subs.battery_sub, &buf.battery)) {
+			if (check_sdlog2_configuration("battery_status") && 
+				copy_if_updated(ORB_ID(battery_status), &subs.battery_sub, &buf.battery)) {
 				log_msg.msg_type = LOG_BATT_MSG;
 				log_msg.body.log_BATT.voltage = buf.battery.voltage_v;
 				log_msg.body.log_BATT.voltage_filtered = buf.battery.voltage_filtered_v;
@@ -1958,7 +2037,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- GLOBAL POSITION SETPOINT --- */
-			if (copy_if_updated(ORB_ID(position_setpoint_triplet), &subs.triplet_sub, &buf.triplet)) {
+			if (check_sdlog2_configuration("position_setpoint_triplet") && 
+				copy_if_updated(ORB_ID(position_setpoint_triplet), &subs.triplet_sub, &buf.triplet)) {
 
 				if (buf.triplet.current.valid) {
 					log_msg.msg_type = LOG_GPSP_MSG;
@@ -1976,7 +2056,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- MOCAP ATTITUDE AND POSITION --- */
-			if (copy_if_updated(ORB_ID(att_pos_mocap), &subs.att_pos_mocap_sub, &buf.att_pos_mocap)) {
+			if (check_sdlog2_configuration("att_pos_mocap") && 
+				copy_if_updated(ORB_ID(att_pos_mocap), &subs.att_pos_mocap_sub, &buf.att_pos_mocap)) {
 				log_msg.msg_type = LOG_MOCP_MSG;
 				log_msg.body.log_MOCP.qw = buf.att_pos_mocap.q[0];
 				log_msg.body.log_MOCP.qx = buf.att_pos_mocap.q[1];
@@ -1989,7 +2070,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- VISION POSITION --- */
-			if (copy_if_updated(ORB_ID(vision_position_estimate), &subs.vision_pos_sub, &buf.vision_pos)) {
+			if (check_sdlog2_configuration("vision_position_estimate") && 
+				copy_if_updated(ORB_ID(vision_position_estimate), &subs.vision_pos_sub, &buf.vision_pos)) {
 				log_msg.msg_type = LOG_VISN_MSG;
 				log_msg.body.log_VISN.x = buf.vision_pos.x;
 				log_msg.body.log_VISN.y = buf.vision_pos.y;
@@ -2005,7 +2087,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- FLOW --- */
-			if (copy_if_updated(ORB_ID(optical_flow), &subs.flow_sub, &buf.flow)) {
+			if (check_sdlog2_configuration("optical_flow") && 
+				copy_if_updated(ORB_ID(optical_flow), &subs.flow_sub, &buf.flow)) {
 				log_msg.msg_type = LOG_FLOW_MSG;
 				log_msg.body.log_FLOW.ground_distance_m = buf.flow.ground_distance_m;
 				log_msg.body.log_FLOW.gyro_temperature = buf.flow.gyro_temperature;
@@ -2021,7 +2104,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- RC CHANNELS --- */
-			if (copy_if_updated(ORB_ID(rc_channels), &subs.rc_sub, &buf.rc)) {
+			if (check_sdlog2_configuration("rc_channels") &&
+				copy_if_updated(ORB_ID(rc_channels), &subs.rc_sub, &buf.rc)) {
 				log_msg.msg_type = LOG_RC_MSG;
 				/* Copy only the first 12 channels of 18 */
 				memcpy(log_msg.body.log_RC.channel, buf.rc.channels, sizeof(log_msg.body.log_RC.channel));
@@ -2033,7 +2117,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- AIRSPEED --- */
-			if (copy_if_updated(ORB_ID(airspeed), &subs.airspeed_sub, &buf.airspeed)) {
+			if (check_sdlog2_configuration("airspeed") && 
+				copy_if_updated(ORB_ID(airspeed), &subs.airspeed_sub, &buf.airspeed)) {
 				log_msg.msg_type = LOG_AIRS_MSG;
 				log_msg.body.log_AIRS.indicated_airspeed_m_s = buf.airspeed.indicated_airspeed_m_s;
 				log_msg.body.log_AIRS.true_airspeed_m_s = buf.airspeed.true_airspeed_m_s;
@@ -2044,7 +2129,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- DIFFERENTIAL PRESSURE --- */
-			if (copy_if_updated(ORB_ID(differential_pressure), &subs.diff_pres_sub, &buf.diff_pres)) {
+			if (check_sdlog2_configuration("differential_pressure") && 
+				copy_if_updated(ORB_ID(differential_pressure), &subs.diff_pres_sub, &buf.diff_pres)) {
 				log_msg.msg_type = LOG_DPRS_MSG;
 				log_msg.body.log_DPRS.error_count = buf.diff_pres.error_count;
 				log_msg.body.log_DPRS.differential_pressure_raw_pa = buf.diff_pres.differential_pressure_raw_pa;
@@ -2055,7 +2141,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- ESCs --- */
-			if (copy_if_updated(ORB_ID(esc_status), &subs.esc_sub, &buf.esc)) {
+			if (check_sdlog2_configuration("esc_status") && 
+				copy_if_updated(ORB_ID(esc_status), &subs.esc_sub, &buf.esc)) {
 				for (uint8_t i = 0; i < buf.esc.esc_count; i++) {
 					log_msg.msg_type = LOG_ESC_MSG;
 					log_msg.body.log_ESC.counter = buf.esc.counter;
@@ -2075,7 +2162,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- GLOBAL VELOCITY SETPOINT --- */
-			if (copy_if_updated(ORB_ID(vehicle_global_velocity_setpoint), &subs.global_vel_sp_sub, &buf.global_vel_sp)) {
+			if (check_sdlog2_configuration("vehicle_global_velocity_setpoint") &&
+				copy_if_updated(ORB_ID(vehicle_global_velocity_setpoint), &subs.global_vel_sp_sub, &buf.global_vel_sp)) {
 				log_msg.msg_type = LOG_GVSP_MSG;
 				log_msg.body.log_GVSP.vx = buf.global_vel_sp.vx;
 				log_msg.body.log_GVSP.vy = buf.global_vel_sp.vy;
@@ -2084,7 +2172,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- BATTERY --- */
-			if (copy_if_updated(ORB_ID(battery_status), &subs.battery_sub, &buf.battery)) {
+			if (check_sdlog2_configuration("battery_status") && 
+				copy_if_updated(ORB_ID(battery_status), &subs.battery_sub, &buf.battery)) {
 				log_msg.msg_type = LOG_BATT_MSG;
 				log_msg.body.log_BATT.voltage = buf.battery.voltage_v;
 				log_msg.body.log_BATT.voltage_filtered = buf.battery.voltage_filtered_v;
@@ -2095,7 +2184,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- SYSTEM POWER RAILS --- */
-			if (copy_if_updated(ORB_ID(system_power), &subs.system_power_sub, &buf.system_power)) {
+			if (check_sdlog2_configuration("system_power") &&
+				copy_if_updated(ORB_ID(system_power), &subs.system_power_sub, &buf.system_power)) {
 				log_msg.msg_type = LOG_PWR_MSG;
 				log_msg.body.log_PWR.peripherals_5v = buf.system_power.voltage5V_v;
 				log_msg.body.log_PWR.usb_ok = buf.system_power.usb_connected;
@@ -2114,7 +2204,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 
 			/* --- TELEMETRY --- */
 			for (unsigned i = 0; i < ORB_MULTI_MAX_INSTANCES; i++) {
-				if (copy_if_updated_multi(ORB_ID(telemetry_status), i, &subs.telemetry_subs[i], &buf.telemetry)) {
+				if (check_sdlog2_configuration("telemetry_status") &&
+					copy_if_updated_multi(ORB_ID(telemetry_status), i, &subs.telemetry_subs[i], &buf.telemetry)) {
 					log_msg.msg_type = LOG_TEL0_MSG + i;
 					log_msg.body.log_TEL.rssi = buf.telemetry.rssi;
 					log_msg.body.log_TEL.remote_rssi = buf.telemetry.remote_rssi;
@@ -2129,7 +2220,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- DISTANCE SENSOR --- */
-			if (copy_if_updated(ORB_ID(distance_sensor), &subs.distance_sensor_sub, &buf.distance_sensor)) {
+			if (check_sdlog2_configuration("distance_sensor") &&
+				copy_if_updated(ORB_ID(distance_sensor), &subs.distance_sensor_sub, &buf.distance_sensor)) {
 				log_msg.msg_type = LOG_DIST_MSG;
 				log_msg.body.log_DIST.id = buf.distance_sensor.id;
 				log_msg.body.log_DIST.type = buf.distance_sensor.type;
@@ -2140,7 +2232,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- ESTIMATOR STATUS --- */
-			if (copy_if_updated(ORB_ID(estimator_status), &subs.estimator_status_sub, &buf.estimator_status)) {
+			if (check_sdlog2_configuration("estimator_status") &&
+				copy_if_updated(ORB_ID(estimator_status), &subs.estimator_status_sub, &buf.estimator_status)) {
 				log_msg.msg_type = LOG_EST0_MSG;
 				unsigned maxcopy0 = (sizeof(buf.estimator_status.states) < sizeof(log_msg.body.log_EST0.s)) ? sizeof(buf.estimator_status.states) : sizeof(log_msg.body.log_EST0.s);
 				memset(&(log_msg.body.log_EST0.s), 0, sizeof(log_msg.body.log_EST0.s));
@@ -2175,7 +2268,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- EKF2 INNOVATIONS --- */
-			if (copy_if_updated(ORB_ID(ekf2_innovations), &subs.innov_sub, &buf.innovations)) {
+			if (check_sdlog2_configuration("ekf2_innovations") &&
+				copy_if_updated(ORB_ID(ekf2_innovations), &subs.innov_sub, &buf.innovations)) {
 				log_msg.msg_type = LOG_EST4_MSG;
 				memset(&(log_msg.body.log_INO1.s), 0, sizeof(log_msg.body.log_INO1.s));
 				for (unsigned i = 0; i < 6; i++) {
@@ -2214,7 +2308,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- TECS STATUS --- */
-			if (copy_if_updated(ORB_ID(tecs_status), &subs.tecs_status_sub, &buf.tecs_status)) {
+			if (check_sdlog2_configuration("tecs_status") &&
+				copy_if_updated(ORB_ID(tecs_status), &subs.tecs_status_sub, &buf.tecs_status)) {
 				log_msg.msg_type = LOG_TECS_MSG;
 				log_msg.body.log_TECS.altitudeSp = buf.tecs_status.altitudeSp;
 				log_msg.body.log_TECS.altitudeFiltered = buf.tecs_status.altitude_filtered;
@@ -2235,7 +2330,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- WIND ESTIMATE --- */
-			if (copy_if_updated(ORB_ID(wind_estimate), &subs.wind_sub, &buf.wind_estimate)) {
+			if (check_sdlog2_configuration("wind_estimate") &&
+				copy_if_updated(ORB_ID(wind_estimate), &subs.wind_sub, &buf.wind_estimate)) {
 				log_msg.msg_type = LOG_WIND_MSG;
 				log_msg.body.log_WIND.x = buf.wind_estimate.windspeed_north;
 				log_msg.body.log_WIND.y = buf.wind_estimate.windspeed_east;
@@ -2243,16 +2339,18 @@ int sdlog2_thread_main(int argc, char *argv[])
 				log_msg.body.log_WIND.cov_y = buf.wind_estimate.covariance_east;
 				LOGBUFFER_WRITE_AND_COUNT(WIND);
 			}
-
+			
 			/* --- TIMESYNC OFFSET --- */
-			if (copy_if_updated(ORB_ID(time_offset), &subs.tsync_sub, &buf.time_offset)) {
+			if (check_sdlog2_configuration("time_offset") && 
+				copy_if_updated(ORB_ID(time_offset), &subs.tsync_sub, &buf.time_offset)) {
 				log_msg.msg_type = LOG_TSYN_MSG;
 				log_msg.body.log_TSYN.time_offset = buf.time_offset.offset_ns;
 				LOGBUFFER_WRITE_AND_COUNT(TSYN);
 			}
 
 			/* --- MULTIROTOR ATTITUDE CONTROLLER STATUS --- */
-			if (copy_if_updated(ORB_ID(mc_att_ctrl_status), &subs.mc_att_ctrl_status_sub, &buf.mc_att_ctrl_status)) {
+			if (check_sdlog2_configuration("mc_att_ctrl_status") &&
+				copy_if_updated(ORB_ID(mc_att_ctrl_status), &subs.mc_att_ctrl_status_sub, &buf.mc_att_ctrl_status)) {
 				log_msg.msg_type = LOG_MACS_MSG;
 				log_msg.body.log_MACS.roll_rate_integ = buf.mc_att_ctrl_status.roll_rate_integ;
 				log_msg.body.log_MACS.pitch_rate_integ = buf.mc_att_ctrl_status.pitch_rate_integ;
@@ -2261,7 +2359,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			}
 
 			/* --- CONTROL STATE --- */
-			if (copy_if_updated(ORB_ID(control_state), &subs.ctrl_state_sub, &buf.ctrl_state)) {
+			if (check_sdlog2_configuration("control_state") && 
+				copy_if_updated(ORB_ID(control_state), &subs.ctrl_state_sub, &buf.ctrl_state)) {
 				log_msg.msg_type = LOG_CTS_MSG;
 				log_msg.body.log_CTS.vx_body = buf.ctrl_state.x_vel;
 				log_msg.body.log_CTS.vy_body = buf.ctrl_state.y_vel;
@@ -2272,10 +2371,12 @@ int sdlog2_thread_main(int argc, char *argv[])
 				log_msg.body.log_CTS.yaw_rate = buf.ctrl_state.yaw_rate;
 				LOGBUFFER_WRITE_AND_COUNT(CTS);
 			}
-		}
+
+		} // if log type all or normal
 
 		/* --- ATTITUDE --- */
-		if (copy_if_updated(ORB_ID(vehicle_attitude), &subs.att_sub, &buf.att)) {
+		if (check_sdlog2_configuration("vehicle_attitude") &&
+			copy_if_updated(ORB_ID(vehicle_attitude), &subs.att_sub, &buf.att)) {
 			log_msg.msg_type = LOG_ATT_MSG;
 			float q0 = buf.att.q[0];
 			float q1 = buf.att.q[1];
@@ -2295,7 +2396,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 		}
 
 		/* --- CAMERA TRIGGER --- */
-		if (copy_if_updated(ORB_ID(camera_trigger), &subs.cam_trig_sub, &buf.camera_trigger)) {
+		if (check_sdlog2_configuration("camera_trigger") &&
+			copy_if_updated(ORB_ID(camera_trigger), &subs.cam_trig_sub, &buf.camera_trigger)) {
 			log_msg.msg_type = LOG_CAMT_MSG;
 			log_msg.body.log_CAMT.timestamp = buf.camera_trigger.timestamp;
 			log_msg.body.log_CAMT.seq = buf.camera_trigger.seq;
@@ -2303,26 +2405,57 @@ int sdlog2_thread_main(int argc, char *argv[])
 		}
 
 		/* --- LAND DETECTED --- */
-		if (copy_if_updated(ORB_ID(vehicle_land_detected), &subs.land_detected_sub, &buf.land_detected)) {
+		if (check_sdlog2_configuration("vehicle_land_detected") &&
+			copy_if_updated(ORB_ID(vehicle_land_detected), &subs.land_detected_sub, &buf.land_detected)) {
 			log_msg.msg_type = LOG_LAND_MSG;
 			log_msg.body.log_LAND.landed = buf.land_detected.landed;
 			LOGBUFFER_WRITE_AND_COUNT(LAND);
 		}
 
 		/* --- LOAD --- */
-		if (copy_if_updated(ORB_ID(cpuload), &subs.cpuload_sub, &buf.cpuload)) {
+		if (check_sdlog2_configuration("cpuload") &&
+			copy_if_updated(ORB_ID(cpuload), &subs.cpuload_sub, &buf.cpuload)) {
 			log_msg.msg_type = LOG_LOAD_MSG;
 			log_msg.body.log_LOAD.cpu_load = buf.cpuload.load;
 			LOGBUFFER_WRITE_AND_COUNT(LOAD);
 		}
 
 		/* --- STACK --- */
-		if (copy_if_updated(ORB_ID(low_stack), &subs.low_stack_sub, &buf.low_stack)) {
+		if (check_sdlog2_configuration("low_stack") &&
+			copy_if_updated(ORB_ID(low_stack), &subs.low_stack_sub, &buf.low_stack)) {
 			log_msg.msg_type = LOG_STCK_MSG;
 			log_msg.body.log_STCK.stack_free = buf.low_stack.stack_free;
 			strncpy(log_msg.body.log_STCK.task_name, (char*)buf.low_stack.task_name, sizeof(log_msg.body.log_STCK.task_name));
 			LOGBUFFER_WRITE_AND_COUNT(STCK);
 		}
+
+		/* --- CONTROLLER REFERENCE --- */
+		if (check_sdlog2_configuration("controllers_reference") && 
+			copy_if_updated(ORB_ID(controllers_reference), &subs.cref_sub, &buf.controllers_reference)) {
+			log_msg.msg_type = LOG_CREF_MSG;
+
+			// Position 
+			log_msg.body.log_CREF.x = buf.controllers_reference.x;
+			log_msg.body.log_CREF.y = buf.controllers_reference.y;
+			log_msg.body.log_CREF.z = buf.controllers_reference.z;
+			
+			// Velocity
+			log_msg.body.log_CREF.vx = buf.controllers_reference.vx;
+			log_msg.body.log_CREF.vy = buf.controllers_reference.vy;
+			log_msg.body.log_CREF.vz = buf.controllers_reference.vz;
+
+
+			log_msg.body.log_CREF.yaw = buf.controllers_reference.yaw;
+			log_msg.body.log_CREF.vyaw = buf.controllers_reference.vyaw;
+			log_msg.body.log_CREF.yaw_manual_rpm = buf.controllers_reference.yaw_manual_rpm;
+			
+			log_msg.body.log_CREF.roll = buf.controllers_reference.roll;
+			log_msg.body.log_CREF.pitch = buf.controllers_reference.pitch;
+			log_msg.body.log_CREF.throttle = buf.controllers_reference.throttle;
+
+			LOGBUFFER_WRITE_AND_COUNT(CREF)				
+		}
+
 
 		pthread_mutex_lock(&logbuffer_mutex);
 
@@ -2446,4 +2579,21 @@ void handle_status(struct vehicle_status_s *status)
 			sdlog2_stop_log();
 		}
 	}
+}
+
+
+bool check_sdlog2_configuration(char* str) {
+	
+	// If topic map is not initialized enable by default
+	if (!topic_map_initialized) {
+		return true;
+	}
+
+	// Get the value and see if it's enabled
+	int error = hashmap_get(topic_map, str, (void**)&map_value);
+	bool flag = (error == MAP_OK) && 
+		(map_value->enabled == 1); 
+
+	//printf("%s %d %d\n", str, error, map_value->enabled);
+	return flag;
 }

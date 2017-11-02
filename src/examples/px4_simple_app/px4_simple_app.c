@@ -50,6 +50,7 @@
 #include <uORB/uORB.h>
 #include <uORB/topics/sensor_combined.h>
 #include <uORB/topics/vehicle_attitude.h>
+#include <uORB/topics/controllers_reference.h>
 
 __EXPORT int px4_simple_app_main(int argc, char *argv[]);
 
@@ -63,9 +64,10 @@ int px4_simple_app_main(int argc, char *argv[])
 	orb_set_interval(sensor_sub_fd, 200);
 
 	/* advertise attitude topic */
-	struct vehicle_attitude_s att;
+	struct controllers_reference_s att;
 	memset(&att, 0, sizeof(att));
-	orb_advert_t att_pub = orb_advertise(ORB_ID(vehicle_attitude), &att);
+	//orb_advert_t att_pub = orb_advertise(ORB_ID(vehicle_attitude), &att);
+	orb_advert_t att_pub = orb_advertise(ORB_ID(controllers_reference), &att);
 
 	/* one could wait for multiple topics with this technique, just using one here */
 	px4_pollfd_struct_t fds[] = {
@@ -102,7 +104,7 @@ int px4_simple_app_main(int argc, char *argv[])
 				struct sensor_combined_s raw;
 				/* copy sensors raw data into local buffer */
 				orb_copy(ORB_ID(sensor_combined), sensor_sub_fd, &raw);
-				PX4_INFO("Accelerometer:\t%8.4f\t%8.4f\t%8.4f",
+				PX4_INFO("Akcelerometar:\t%8.4f\t%8.4f\t%8.4f",
 					 (double)raw.accelerometer_m_s2[0],
 					 (double)raw.accelerometer_m_s2[1],
 					 (double)raw.accelerometer_m_s2[2]);
@@ -110,11 +112,18 @@ int px4_simple_app_main(int argc, char *argv[])
 				/* set att and publish this information for other apps
 				 the following does not have any meaning, it's just an example
 				*/
-				att.q[0] = raw.accelerometer_m_s2[0];
-				att.q[1] = raw.accelerometer_m_s2[1];
-				att.q[2] = raw.accelerometer_m_s2[2];
+				
+				//att.q[0] = raw.accelerometer_m_s2[0];
+				//att.q[1] = raw.accelerometer_m_s2[1];
+				//att.q[2] = raw.accelerometer_m_s2[2];
 
-				orb_publish(ORB_ID(vehicle_attitude), att_pub, &att);
+				att.x = raw.accelerometer_m_s2[0];
+				att.y = raw.accelerometer_m_s2[1];
+				att.z = raw.accelerometer_m_s2[2];
+				
+
+				//orb_publish(ORB_ID(vehicle_attitude), att_pub, &att);
+				orb_publish(ORB_ID(controllers_reference), att_pub, &att);
 			}
 
 			/* there could be more file descriptors here, in the form like:

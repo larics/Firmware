@@ -641,6 +641,32 @@ struct log_STCK_s {
 	uint16_t stack_free;
 };
 
+// TODO Add remaining topics here
+
+/* --- CONTROLLER REFERENCE --- */
+#define LOG_CREF_MSG 64
+struct log_CREF_s {
+	float x;
+	float y;
+	float z;
+
+	float vx;
+	float vy;
+	float vz;
+	
+	float ax;
+	float ay;
+	float az;
+	
+	float yaw;
+	float vyaw;
+	float yaw_manual_rpm;
+	
+	float roll;
+	float pitch;
+	float throttle;
+};
+
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
 
 /* --- TIME - TIME STAMP --- */
@@ -732,6 +758,10 @@ static const struct log_format_s log_formats[] = {
 	LOG_FORMAT(LOAD, "f", "CPU"),
 	LOG_FORMAT(DPRS, "Qffff", "errors,DPRESraw,DPRES,DPRESmax,Temp"),
 	LOG_FORMAT(STCK, "NH", "Task,Free"),
+
+	// Add controller reference message format
+	LOG_FORMAT(CREF, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,yaw,vYaw,yawRpm,roll,pitch,thrtl"),
+
 	/* system-level messages, ID >= 0x80 */
 	/* FMT: don't write format of format message, it's useless */
 	LOG_FORMAT(TIME, "Q", "StartTime"),
