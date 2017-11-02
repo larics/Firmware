@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsystemcmds__ver.a  CMakeFiles/systemcmds__ver.dir/ver.c.o
-/usr/bin/ranlib libsystemcmds__ver.a

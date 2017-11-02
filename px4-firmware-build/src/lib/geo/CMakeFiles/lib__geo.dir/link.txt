@@ -1,2 +1,0 @@
-/usr/bin/ar qc liblib__geo.a  CMakeFiles/lib__geo.dir/geo.c.o
-/usr/bin/ranlib liblib__geo.a
