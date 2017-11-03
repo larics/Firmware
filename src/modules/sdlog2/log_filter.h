@@ -1,14 +1,13 @@
 #include <c_hashmap/hashmap.h>
-
+#include <px4_log.h>
 
 #ifndef __LOG_FILTER_H
 #define __LOG_FILTER_H
 
-
 /** 
  * Buffer line size used by the text parser.
  */
-#define LINE_SIZE 1000
+#define LINE_SIZE 1200
 
 /**
  * HashMap constants 

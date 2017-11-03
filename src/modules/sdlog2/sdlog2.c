@@ -49,6 +49,8 @@
 #include <px4_tasks.h>
 #include <px4_time.h>
 #include <px4_posix.h>
+#include <px4_log.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef __PX4_DARWIN
@@ -1505,12 +1507,12 @@ int sdlog2_thread_main(int argc, char *argv[])
 	// *****************************************************************
 	#ifdef __LOG_FILTER_H
 		if (topic_map_initialized) {
-			PX4_WARN("sdlog2 configuration already initialized.");
+			PX4_INFO("sdlog2 configuration already initialized.");
 		} else {
 			int result = initialize_topic_map();
 			
-			if (result >= 0) {
-				PX4_WARN("sdlog2 configuration initialized.");
+			if (result == 0) {
+				PX4_INFO("sdlog2 configuration successfully initialized.");
 				topic_map_initialized = true;
 
 			} else if (result == -1) {
@@ -1518,7 +1520,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 				topic_map_initialized = false;
 
 			} else if (result == -2) {
-				PX4_WARN("Unable to initialize all topic configurations.");
+				PX4_WARN("Unable to initialize topic map successfully.");
 				topic_map_initialized = false;
 
 			} else {
@@ -2584,7 +2586,7 @@ void handle_status(struct vehicle_status_s *status)
 
 bool check_sdlog2_configuration(char* str) {
 	
-	// If topic map is not initialized enable by default
+	// If topic map is not initialized enable it by default
 	if (!topic_map_initialized) {
 		return true;
 	}
