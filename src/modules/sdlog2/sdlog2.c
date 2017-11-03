@@ -1329,6 +1329,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_ASRV_s log_ASRV;				// Attitude controller status - roll - rate - vpc
 			struct log_ASPV_s log_ASPV;				// Attitude controller status - pitch - rate - vpc
 			struct log_ATCR_s log_ATCR;				// Attitude controller reference
+			struct log_MCRE_s log_MCRE;				// MCU - controller reference
+			struct log_SMRE_s log_SMRE;				// Control-SM controller reference
 
 			// ******************************************************
 
@@ -1390,7 +1392,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int cref_sub;
 		int att_control_status_sub;
 		int att_control_ref_sub;
-		
+		int mcu_cref_sub;
+		int sm_cref_sub;
+
 		// ******************************************************
 	} subs;
 
@@ -1443,6 +1447,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.cref_sub = -1;
 	subs.att_control_status_sub = -1;
 	subs.att_control_ref_sub = -1;
+	subs.mcu_cref_sub = -1;
+	subs.sm_cref_sub = -1;
 
 	// ******************************************************
 
@@ -2471,25 +2477,60 @@ int sdlog2_thread_main(int argc, char *argv[])
 			copy_if_updated(ORB_ID(controllers_reference), &subs.cref_sub, &buf.controllers_reference)) {
 			log_msg.msg_type = LOG_CREF_MSG;
 
-			// Position 
 			log_msg.body.log_CREF.x = buf.controllers_reference.x;
 			log_msg.body.log_CREF.y = buf.controllers_reference.y;
 			log_msg.body.log_CREF.z = buf.controllers_reference.z;
-			
-			// Velocity
 			log_msg.body.log_CREF.vy = buf.controllers_reference.vy;
 			log_msg.body.log_CREF.vz = buf.controllers_reference.vz;
-
-
 			log_msg.body.log_CREF.yaw = buf.controllers_reference.yaw;
 			log_msg.body.log_CREF.vyaw = buf.controllers_reference.vyaw;
 			log_msg.body.log_CREF.yaw_manual_rpm = buf.controllers_reference.yaw_manual_rpm;
-			
 			log_msg.body.log_CREF.roll = buf.controllers_reference.roll;
 			log_msg.body.log_CREF.pitch = buf.controllers_reference.pitch;
 			log_msg.body.log_CREF.throttle = buf.controllers_reference.throttle;
 
 			LOGBUFFER_WRITE_AND_COUNT(CREF)				
+		}
+
+		/* --- MCU - CONTROLLER REFERENCE --- */
+		if (check_sdlog2_configuration("mcu_controllers_reference") && 
+			copy_if_updated(ORB_ID(mcu_controllers_reference), &subs.mcu_cref_sub, &buf.controllers_reference)) {
+			log_msg.msg_type = LOG_MCRE_MSG;
+
+			log_msg.body.log_MCRE.x = buf.controllers_reference.x;
+			log_msg.body.log_MCRE.y = buf.controllers_reference.y;
+			log_msg.body.log_MCRE.z = buf.controllers_reference.z;
+			log_msg.body.log_MCRE.vy = buf.controllers_reference.vy;
+			log_msg.body.log_MCRE.vz = buf.controllers_reference.vz;
+			log_msg.body.log_MCRE.yaw = buf.controllers_reference.yaw;
+			log_msg.body.log_MCRE.vyaw = buf.controllers_reference.vyaw;
+			log_msg.body.log_MCRE.yaw_manual_rpm = buf.controllers_reference.yaw_manual_rpm;
+			log_msg.body.log_MCRE.roll = buf.controllers_reference.roll;
+			log_msg.body.log_MCRE.pitch = buf.controllers_reference.pitch;
+			log_msg.body.log_MCRE.throttle = buf.controllers_reference.throttle;
+
+			LOGBUFFER_WRITE_AND_COUNT(MCRE)
+		}
+
+		/* --- SM - CONTROLLER REFERENCE --- */
+		if (check_sdlog2_configuration("ctrl_sm_controllers_reference") && 
+			copy_if_updated(ORB_ID(ctrl_sm_controllers_reference), &subs.sm_cref_sub, 
+				&buf.controllers_reference)) {
+			log_msg.msg_type = LOG_SMRE_MSG;
+
+			log_msg.body.log_SMRE.x = buf.controllers_reference.x;
+			log_msg.body.log_SMRE.y = buf.controllers_reference.y;
+			log_msg.body.log_SMRE.z = buf.controllers_reference.z;
+			log_msg.body.log_SMRE.vy = buf.controllers_reference.vy;
+			log_msg.body.log_SMRE.vz = buf.controllers_reference.vz;
+			log_msg.body.log_SMRE.yaw = buf.controllers_reference.yaw;
+			log_msg.body.log_SMRE.vyaw = buf.controllers_reference.vyaw;
+			log_msg.body.log_SMRE.yaw_manual_rpm = buf.controllers_reference.yaw_manual_rpm;
+			log_msg.body.log_SMRE.roll = buf.controllers_reference.roll;
+			log_msg.body.log_SMRE.pitch = buf.controllers_reference.pitch;
+			log_msg.body.log_SMRE.throttle = buf.controllers_reference.throttle;
+
+			LOGBUFFER_WRITE_AND_COUNT(SMRE)
 		}
 
 		/* --- CONTROLLER ATTITUDE STATUS --- */

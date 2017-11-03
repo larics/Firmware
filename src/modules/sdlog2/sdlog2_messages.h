@@ -810,6 +810,46 @@ struct log_ATCR_s {
 	int8_t yaw_rate_control;
 };
 
+/* --- MCU - CONTROLLER REFERENCE --- */
+#define LOG_MCRE_MSG 74
+struct log_MCRE_s {
+	float x;
+	float y;
+	float z;
+	float vx;
+	float vy;
+	float vz;
+	float ax;
+	float ay;
+	float az;
+	float yaw;
+	float vyaw;
+	float yaw_manual_rpm;
+	float roll;
+	float pitch;
+	float throttle;
+};
+
+/* --- CONTROL - SM CONTROLLERS REFERENCE --- */
+#define LOG_SMRE_MSG 75
+struct log_SMRE_s {
+	float x;
+	float y;
+	float z;
+	float vx;
+	float vy;
+	float vz;
+	float ax;
+	float ay;
+	float az;
+	float yaw;
+	float vyaw;
+	float yaw_manual_rpm;
+	float roll;
+	float pitch;
+	float throttle;
+};
+
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
 
 /* --- TIME - TIME STAMP --- */
@@ -906,6 +946,8 @@ static const struct log_format_s log_formats[] = {
 	// ***************************************
 	
 	LOG_FORMAT(CREF, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,yaw,vYaw,yawRpm,roll,pitch,thrtl"),
+	LOG_FORMAT(MCRE, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,yaw,vYaw,yawRpm,roll,pitch,thrtl"),
+	LOG_FORMAT(SMRE, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,yaw,vYaw,yawRpm,roll,pitch,thrtl"),
 	LOG_FORMAT(ACSR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(ASRR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(ACSP, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
