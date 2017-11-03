@@ -667,6 +667,134 @@ struct log_CREF_s {
 	float throttle;
 };
 
+/* --- ATTITUDE CONTROLLER STATUS - ROLL --- */
+#define LOG_ACSR_MSG 65
+struct log_ACSR_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - ROLL-RATE --- */
+#define LOG_ASRR_MSG 66
+struct log_ASRR_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - PITCH --- */
+#define LOG_ACSP_MSG 67
+struct log_ACSP_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - PITCH-RATE --- */
+#define LOG_ASPR_MSG 68
+struct log_ASPR_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - YAW --- */
+#define LOG_ACSY_MSG 69
+struct log_ACSY_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* ATTITUDE CONTROLLER STATUS - YAW - RATE --- */
+#define LOG_ASYR_MSG 70
+struct log_ASYR_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - ROLL-RATE-VPC --- */
+#define LOG_ASRV_MSG 71
+struct log_ASRV_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - PITCH-RATE-VPC --- */
+#define LOG_ASPV_MSG 72 
+struct log_ASPV_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
 
 /* --- TIME - TIME STAMP --- */
@@ -759,8 +887,20 @@ static const struct log_format_s log_formats[] = {
 	LOG_FORMAT(DPRS, "Qffff", "errors,DPRESraw,DPRES,DPRESmax,Temp"),
 	LOG_FORMAT(STCK, "NH", "Task,Free"),
 
-	// Add controller reference message format
+	// Additional topic messages formatting
+	// ***************************************
+	
 	LOG_FORMAT(CREF, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,yaw,vYaw,yawRpm,roll,pitch,thrtl"),
+	LOG_FORMAT(ACSR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASRR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ACSP, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASPR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ACSY, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASYR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASPV, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASRV, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	
+	// ***************************************
 
 	/* system-level messages, ID >= 0x80 */
 	/* FMT: don't write format of format message, it's useless */
