@@ -795,6 +795,21 @@ struct log_ASPV_s {
 	uint8_t mode; 			// Mode 
 };
 
+/* --- ATTITUDE CONTROLLER REFERENCE --- */
+#define LOG_ATCR_MSG 73
+struct log_ATCR_s {
+	float roll;
+	float pitch;
+	float yaw;
+	float yaw_rate;
+	float throttle;
+	int8_t armed; 			
+	int8_t roll_control;
+	int8_t pitch_control;
+	int8_t yaw_control;
+	int8_t yaw_rate_control;
+};
+
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
 
 /* --- TIME - TIME STAMP --- */
@@ -899,7 +914,8 @@ static const struct log_format_s log_formats[] = {
 	LOG_FORMAT(ASYR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(ASPV, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(ASRV, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
-	
+	LOG_FORMAT(ATCR, "fffffbbbbb", "roll,pitch,yaw,yawR,trtl,arm,rollCtl,pitchCtl,yawCtl,yawRCtl"),
+
 	// ***************************************
 
 	/* system-level messages, ID >= 0x80 */

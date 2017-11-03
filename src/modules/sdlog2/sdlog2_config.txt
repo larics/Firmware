@@ -39,3 +39,5 @@ TOPIC=vtol_vehicle_status	                ENABLED=false
 TOPIC=sensor_combined		                ENABLED=false
 TOPIC=ekf2_replay			                ENABLED=false
 TOPIC=commander_state		                ENABLED=false
+TOPIC=attitude_controller_status			ENABLED=true
+TOPIC=attitude_controller_reference			ENABLED=true

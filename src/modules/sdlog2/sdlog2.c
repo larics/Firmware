@@ -121,6 +121,7 @@
 #include <uORB/topics/controllers_reference.h>
 #include <uORB/topics/attitude_controller_status.h>
 #include <uORB/topics/pid_status.h>
+#include <uORB/topics/attitude_controller_reference.h>
 
 // *************************************
 
@@ -1248,6 +1249,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		
 		struct controllers_reference_s controllers_reference;
 		struct attitude_controller_status_s attitude_controller_status;
+		struct attitude_controller_reference_s attitude_controller_reference;
 
 		// ******************************************************
 	} buf;
@@ -1318,16 +1320,16 @@ int sdlog2_thread_main(int argc, char *argv[])
 			// ******************************************************
 
 			struct log_CREF_s log_CREF; 			// Controller reference
-			
-			struct log_ACSR_s log_ACSR;				// Attitutde controller reference - roll
-			struct log_ASRR_s log_ASRR;			// Attitutde controller reference - roll - rate
-			struct log_ACSP_s log_ACSP;				// Attitutde controller reference - pitch
-			struct log_ASPR_s log_ASPR;			// Attitutde controller reference - pitch - rate
-			struct log_ACSY_s log_ACSY;				// Attitutde controller reference - yaw
-			struct log_ASYR_s log_ASYR;			// Attitutde controller reference - yaw - rate
-			struct log_ASRV_s log_ASRV;			// Attitutde controller reference - roll - rate - vpc
-			struct log_ASPV_s log_ASPV;			// Attitutde controller reference - pitch - rate - vpc
-			
+			struct log_ACSR_s log_ACSR;				// Attitude controller status - roll
+			struct log_ASRR_s log_ASRR;				// Attitude controller status - roll - rate
+			struct log_ACSP_s log_ACSP;				// Attitude controller status - pitch
+			struct log_ASPR_s log_ASPR;				// Attitude controller status - pitch - rate
+			struct log_ACSY_s log_ACSY;				// Attitude controller status - yaw
+			struct log_ASYR_s log_ASYR;				// Attitude controller status - yaw - rate
+			struct log_ASRV_s log_ASRV;				// Attitude controller status - roll - rate - vpc
+			struct log_ASPV_s log_ASPV;				// Attitude controller status - pitch - rate - vpc
+			struct log_ATCR_s log_ATCR;				// Attitude controller reference
+
 			// ******************************************************
 
 		} body;
@@ -1386,8 +1388,9 @@ int sdlog2_thread_main(int argc, char *argv[])
 		// ******************************************************
 		
 		int cref_sub;
-		int acs_sub;
-
+		int att_control_status_sub;
+		int att_control_ref_sub;
+		
 		// ******************************************************
 	} subs;
 
@@ -1438,7 +1441,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 	// ******************************************************
 	
 	subs.cref_sub = -1;
-	subs.acs_sub = -1;
+	subs.att_control_status_sub = -1;
+	subs.att_control_ref_sub = -1;
 
 	// ******************************************************
 
@@ -2490,7 +2494,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 
 		/* --- CONTROLLER ATTITUDE STATUS --- */
 		if (check_sdlog2_configuration("attitude_controller_status") && 
-			copy_if_updated(ORB_ID(attitude_controller_status), &subs.acs_sub, 
+			copy_if_updated(ORB_ID(attitude_controller_status), &subs.att_control_status_sub, 
 				&buf.attitude_controller_status)) {	
 
 			// Roll
@@ -2613,6 +2617,26 @@ int sdlog2_thread_main(int argc, char *argv[])
 			log_msg.body.log_ASPV.mode = buf.attitude_controller_status.pitch_rate_vpc.mode;
 			LOGBUFFER_WRITE_AND_COUNT(ASPV)		
 		}
+
+		/* --- ATTITUDE CONTROLLER REFERENCE --- */
+		if (check_sdlog2_configuration("attitude_controller_reference") &&
+			copy_if_updated(ORB_ID(attitude_controller_reference), &subs.att_control_ref_sub, 
+				&buf.attitude_controller_reference)) {
+			
+			log_msg.msg_type = LOG_ATCR_MSG;
+			log_msg.body.log_ATCR.roll = buf.attitude_controller_reference.roll;
+			log_msg.body.log_ATCR.pitch = buf.attitude_controller_reference.pitch;
+			log_msg.body.log_ATCR.yaw = buf.attitude_controller_reference.yaw;
+			log_msg.body.log_ATCR.yaw_rate = buf.attitude_controller_reference.yaw_rate;
+			log_msg.body.log_ATCR.throttle = buf.attitude_controller_reference.throttle;
+			log_msg.body.log_ATCR.armed = buf.attitude_controller_reference.armed ? 1 : 0;
+			log_msg.body.log_ATCR.roll_control = buf.attitude_controller_reference.roll_control ? 1 : 0;
+			log_msg.body.log_ATCR.pitch_control = buf.attitude_controller_reference.pitch_control ? 1 : 0;
+			log_msg.body.log_ATCR.yaw_control = buf.attitude_controller_reference.yaw_control ? 1 : 0;	
+			log_msg.body.log_ATCR.yaw_rate_control = buf.attitude_controller_reference.yaw_rate_control ? 1 : 0;	
+			LOGBUFFER_WRITE_AND_COUNT(ATCR);
+		}
+
 
 		pthread_mutex_lock(&logbuffer_mutex);
 
