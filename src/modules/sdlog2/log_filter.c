@@ -44,12 +44,13 @@ parse_xml(char *buff, size_t buff_size)
         return -1;
     }
 
-    char str1[32], str2[32];
+    char str1[64], str2[64];
     
     // read as many line as you can
     while(fgets(buff, LINE_SIZE, fid)) {
         
-        if (sscanf(buff, "TOPIC=%s ENABLED=%s", str1, str2) <= 0) {
+        // expected 2 tokens
+        if (sscanf(buff, "TOPIC=%s ENABLED=%s", str1, str2) != 2) {
             continue;
         }
 
@@ -63,9 +64,13 @@ parse_xml(char *buff, size_t buff_size)
         new_value->enabled = 1;
     
         // Try to put value in the map
-        if (hashmap_put(topic_map, new_value->key_string, new_value) != MAP_OK) {
+        int error = hashmap_put(topic_map, new_value->key_string, new_value); 
+        if (error != MAP_OK) {
+            PX4_WARN("Unable to add new entry to hashmap - possible memory problem.");
             return -2;
         }
+
+        PX4_INFO("Logging topic: %s", str1);
     }
 
     fclose(fid);
