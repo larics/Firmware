@@ -55,6 +55,7 @@
 #include <uORB/topics/pid_status.h>
 #include <uORB/topics/attitude_controller_reference.h>
 #include <uORB/topics/controllers_mode.h>
+#include <uORB/topics/position_controller_status.h>
 
 __EXPORT int px4_simple_app_main(int argc, char *argv[]);
 
@@ -69,10 +70,10 @@ int px4_simple_app_main(int argc, char *argv[])
 	orb_set_interval(sensor_sub_fd, 200);
 
 	/* advertise attitude topic */
-	struct controllers_mode_s data;
+	struct position_controller_status_s data;
 	memset(&data, 0, sizeof(data));
 	//orb_advert_t att_pub = orb_advertise(ORB_ID(vehicle_attitude), &att);
-	orb_advert_t att_pub = orb_advertise(ORB_ID(commander_controllers_mode), &data);
+	orb_advert_t att_pub = orb_advertise(ORB_ID(position_controller_status), &data);
 
 	/* one could wait for multiple topics with this technique, just using one here */
 	px4_pollfd_struct_t fds[] = {
@@ -122,9 +123,16 @@ int px4_simple_app_main(int argc, char *argv[])
 				//att.q[1] = raw.accelerometer_m_s2[1];
 				//att.q[2] = raw.accelerometer_m_s2[2];
 
-				data.armed = true;
-				data.controller_x =  true;
-				data.controller_y =  true;
+				struct pid_status_s stat;
+				memset(&stat, 0, sizeof(stat));
+				stat.gain_proportional = 1;
+				stat.gain_integral = 2;
+				stat.gain_derivative = 3; 
+
+				data.y = stat;
+				//data.armed = true;
+				//data.controller_x =  true;
+				//data.controller_y =  true;
 
 				//orb_publish(ORB_ID(vehicle_attitude), att_pub, &att);
 				orb_publish(ORB_ID(commander_controllers_mode), att_pub, &data);

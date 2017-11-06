@@ -123,6 +123,7 @@
 #include <uORB/topics/pid_status.h>
 #include <uORB/topics/attitude_controller_reference.h>
 #include <uORB/topics/controllers_mode.h>
+#include <uORB/topics/position_controller_status.h>
 
 // *************************************
 
@@ -1252,6 +1253,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		struct attitude_controller_status_s attitude_controller_status;
 		struct attitude_controller_reference_s attitude_controller_reference;
 		struct controllers_mode_s controller_mode;
+		struct position_controller_status_s pos_controller_status;
 
 		// ******************************************************
 	} buf;
@@ -1335,6 +1337,12 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_SMRE_s log_SMRE;				// Control-SM controller reference
 			struct log_MCMD_s log_MCMD;				// MCU - controllers mode
 			struct log_CCMD_s log_CCMD;				// Commander - controllers mode
+			struct log_PCSX_s log_PCSX; 			// Position controller status - x
+			struct log_PCVX_s log_PCVX;				// Position controller status - vx
+			struct log_PCSY_s log_PCSY;				// Position controller status - y
+			struct log_PCVY_s log_PCVY;				// Position controller status - vy
+			struct log_PCSZ_s log_PCSZ;				// Position controller status - z
+			struct log_PCVZ_s log_PCVZ;				// Position controller status - vz
 
 			// ******************************************************
 
@@ -1400,6 +1408,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int sm_cref_sub;
 		int mcu_cmode_sub;
 		int commander_cmode_sub;
+		int pos_controller_status_sub;
 
 		// ******************************************************
 	} subs;
@@ -1457,6 +1466,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.sm_cref_sub = -1;
 	subs.mcu_cmode_sub = -1;
 	subs.commander_cmode_sub = -1;
+	subs.pos_controller_status_sub = -1;
 
 	// ******************************************************
 
@@ -2724,6 +2734,102 @@ int sdlog2_thread_main(int argc, char *argv[])
 			log_msg.body.log_CCMD.controller_yaw = buf.controller_mode.controller_yaw ? 1 : 0;
 			log_msg.body.log_CCMD.controller_yaw_rate = buf.controller_mode.controller_yaw_rate ? 1 : 0;
 			LOGBUFFER_WRITE_AND_COUNT(CCMD)
+		}
+
+
+		if (check_sdlog2_configuration("position_controller_status") &&
+			copy_if_updated(ORB_ID(position_controller_status), &subs.pos_controller_status_sub, 
+				&buf.pos_controller_status)) {
+
+			// X
+			log_msg.msg_type = LOG_PCSX_MSG;
+			log_msg.body.log_PCSX.p = buf.pos_controller_status.x.gain_proportional;
+			log_msg.body.log_PCSX.i = buf.pos_controller_status.x.gain_integral;
+			log_msg.body.log_PCSX.d = buf.pos_controller_status.x.gain_derivative;
+			log_msg.body.log_PCSX.sample_rate = buf.pos_controller_status.x.sample_rate;
+			log_msg.body.log_PCSX.sp = buf.pos_controller_status.x.setpoint;
+			log_msg.body.log_PCSX.feedback = buf.pos_controller_status.x.feedback;
+			log_msg.body.log_PCSX.out = buf.pos_controller_status.x.output;
+			log_msg.body.log_PCSX.out_p = buf.pos_controller_status.x.output_proportional;
+			log_msg.body.log_PCSX.out_i = buf.pos_controller_status.x.output_integral;
+			log_msg.body.log_PCSX.out_d = buf.pos_controller_status.x.output_derivative;
+			log_msg.body.log_PCSX.mode = buf.pos_controller_status.x.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCSX)
+
+			// VX
+			log_msg.msg_type = LOG_PCVX_MSG;
+			log_msg.body.log_PCVX.p = buf.pos_controller_status.vx.gain_proportional;
+			log_msg.body.log_PCVX.i = buf.pos_controller_status.vx.gain_integral;
+			log_msg.body.log_PCVX.d = buf.pos_controller_status.vx.gain_derivative;
+			log_msg.body.log_PCVX.sample_rate = buf.pos_controller_status.vx.sample_rate;
+			log_msg.body.log_PCVX.sp = buf.pos_controller_status.vx.setpoint;
+			log_msg.body.log_PCVX.feedback = buf.pos_controller_status.vx.feedback;
+			log_msg.body.log_PCVX.out = buf.pos_controller_status.vx.output;
+			log_msg.body.log_PCVX.out_p = buf.pos_controller_status.vx.output_proportional;
+			log_msg.body.log_PCVX.out_i = buf.pos_controller_status.vx.output_integral;
+			log_msg.body.log_PCVX.out_d = buf.pos_controller_status.vx.output_derivative;
+			log_msg.body.log_PCVX.mode = buf.pos_controller_status.vx.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCVX)		
+
+			// Y
+			log_msg.msg_type = LOG_PCSY_MSG;
+			log_msg.body.log_PCSY.p = buf.pos_controller_status.y.gain_proportional;
+			log_msg.body.log_PCSY.i = buf.pos_controller_status.y.gain_integral;
+			log_msg.body.log_PCSY.d = buf.pos_controller_status.y.gain_derivative;
+			log_msg.body.log_PCSY.sample_rate = buf.pos_controller_status.y.sample_rate;
+			log_msg.body.log_PCSY.sp = buf.pos_controller_status.y.setpoint;
+			log_msg.body.log_PCSY.feedback = buf.pos_controller_status.y.feedback;
+			log_msg.body.log_PCSY.out = buf.pos_controller_status.y.output;
+			log_msg.body.log_PCSY.out_p = buf.pos_controller_status.y.output_proportional;
+			log_msg.body.log_PCSY.out_i = buf.pos_controller_status.y.output_integral;
+			log_msg.body.log_PCSY.out_d = buf.pos_controller_status.y.output_derivative;
+			log_msg.body.log_PCSY.mode = buf.pos_controller_status.y.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCSY)
+
+			// VY
+			log_msg.msg_type = LOG_PCVY_MSG;
+			log_msg.body.log_PCVY.p = buf.pos_controller_status.vy.gain_proportional;
+			log_msg.body.log_PCVY.i = buf.pos_controller_status.vy.gain_integral;
+			log_msg.body.log_PCVY.d = buf.pos_controller_status.vy.gain_derivative;
+			log_msg.body.log_PCVY.sample_rate = buf.pos_controller_status.vy.sample_rate;
+			log_msg.body.log_PCVY.sp = buf.pos_controller_status.vy.setpoint;
+			log_msg.body.log_PCVY.feedback = buf.pos_controller_status.vy.feedback;
+			log_msg.body.log_PCVY.out = buf.pos_controller_status.vy.output;
+			log_msg.body.log_PCVY.out_p = buf.pos_controller_status.vy.output_proportional;
+			log_msg.body.log_PCVY.out_i = buf.pos_controller_status.vy.output_integral;
+			log_msg.body.log_PCVY.out_d = buf.pos_controller_status.vy.output_derivative;
+			log_msg.body.log_PCVY.mode = buf.pos_controller_status.vy.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCVY)		
+
+			// Z
+			log_msg.msg_type = LOG_PCSZ_MSG;
+			log_msg.body.log_PCSZ.p = buf.pos_controller_status.z.gain_proportional;
+			log_msg.body.log_PCSZ.i = buf.pos_controller_status.z.gain_integral;
+			log_msg.body.log_PCSZ.d = buf.pos_controller_status.z.gain_derivative;
+			log_msg.body.log_PCSZ.sample_rate = buf.pos_controller_status.z.sample_rate;
+			log_msg.body.log_PCSZ.sp = buf.pos_controller_status.z.setpoint;
+			log_msg.body.log_PCSZ.feedback = buf.pos_controller_status.z.feedback;
+			log_msg.body.log_PCSZ.out = buf.pos_controller_status.z.output;
+			log_msg.body.log_PCSZ.out_p = buf.pos_controller_status.z.output_proportional;
+			log_msg.body.log_PCSZ.out_i = buf.pos_controller_status.z.output_integral;
+			log_msg.body.log_PCSZ.out_d = buf.pos_controller_status.z.output_derivative;
+			log_msg.body.log_PCSZ.mode = buf.pos_controller_status.z.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCSZ)
+
+			// VZ
+			log_msg.msg_type = LOG_PCVY_MSG;
+			log_msg.body.log_PCVZ.p = buf.pos_controller_status.vz.gain_proportional;
+			log_msg.body.log_PCVZ.i = buf.pos_controller_status.vz.gain_integral;
+			log_msg.body.log_PCVZ.d = buf.pos_controller_status.vz.gain_derivative;
+			log_msg.body.log_PCVZ.sample_rate = buf.pos_controller_status.vz.sample_rate;
+			log_msg.body.log_PCVZ.sp = buf.pos_controller_status.vz.setpoint;
+			log_msg.body.log_PCVZ.feedback = buf.pos_controller_status.vz.feedback;
+			log_msg.body.log_PCVZ.out = buf.pos_controller_status.vz.output;
+			log_msg.body.log_PCVZ.out_p = buf.pos_controller_status.vz.output_proportional;
+			log_msg.body.log_PCVZ.out_i = buf.pos_controller_status.vz.output_integral;
+			log_msg.body.log_PCVZ.out_d = buf.pos_controller_status.vz.output_derivative;
+			log_msg.body.log_PCVZ.mode = buf.pos_controller_status.vz.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCVZ)		
 		}
 
 		pthread_mutex_lock(&logbuffer_mutex);

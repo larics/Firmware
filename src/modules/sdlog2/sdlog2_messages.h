@@ -882,6 +882,102 @@ struct log_CCMD_s {
 	int8_t controller_yaw_rate;
 };
 
+/* --- POSITION CONTROLLER STATUS - X --- */
+#define LOG_PCSX_MSG 78
+struct log_PCSX_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - VX --- */
+#define LOG_PCVX_MSG 79
+struct log_PCVX_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - Y --- */
+#define LOG_PCSY_MSG 80
+struct log_PCSY_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - VY --- */
+#define LOG_PCVY_MSG 81
+struct log_PCVY_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - Z --- */
+#define LOG_PCSZ_MSG 82
+struct log_PCSZ_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - Y --- */
+#define LOG_PCVZ_MSG 80
+struct log_PCVZ_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
 
 /* --- TIME - TIME STAMP --- */
@@ -991,7 +1087,13 @@ static const struct log_format_s log_formats[] = {
 	LOG_FORMAT(ATCR, "fffffbbbbb", "roll,pitch,yaw,yawR,trtl,arm,rollCtl,pitchCtl,yawCtl,yawRCtl"),
 	LOG_FORMAT(MCMD, "bbbbbbbbbbb", "arm,c_x,c_y,c_z,cv_x,cv_y,cv_z,c_roll,c_pitch,c_yaw,c_yawR"),
 	LOG_FORMAT(CCMD, "bbbbbbbbbbb", "arm,c_x,c_y,c_z,cv_x,cv_y,cv_z,c_roll,c_pitch,c_yaw,c_yawR"),
-	
+	LOG_FORMAT(PCSX, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCVX, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCSY, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCVY, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCSZ, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCVZ, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+
 	// ***************************************
 
 	/* system-level messages, ID >= 0x80 */

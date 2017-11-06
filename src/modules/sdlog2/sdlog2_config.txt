@@ -40,6 +40,7 @@ TOPIC=sensor_combined		                ENABLED=false
 TOPIC=ekf2_replay			                ENABLED=false
 TOPIC=commander_state		                ENABLED=false
 TOPIC=attitude_controller_status	        ENABLED=true
-TOPIC=attitude_controller_reference	        ENABLED=true
-TOPIC=mcu_controllers_mode			        ENABLED=true
-TOPIC=commander_controllers_mode	        ENABLED=true
+TOPIC=attitude_controller_reference	        ENABLED=false
+TOPIC=mcu_controllers_mode			        ENABLED=false
+TOPIC=commander_controllers_mode	        ENABLED=false
+TOPIC=position_controller_status            ENABLED=true
