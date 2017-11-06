@@ -2822,7 +2822,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 			LOGBUFFER_WRITE_AND_COUNT(PCSZ)
 
 			// VZ
-			log_msg.msg_type = LOG_PCVY_MSG;
+			log_msg.msg_type = LOG_PCVZ_MSG;
 			log_msg.body.log_PCVZ.p = buf.pos_controller_status.vz.gain_proportional;
 			log_msg.body.log_PCVZ.i = buf.pos_controller_status.vz.gain_integral;
 			log_msg.body.log_PCVZ.d = buf.pos_controller_status.vz.gain_derivative;
