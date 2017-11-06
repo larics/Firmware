@@ -124,6 +124,7 @@
 #include <uORB/topics/attitude_controller_reference.h>
 #include <uORB/topics/controllers_mode.h>
 #include <uORB/topics/position_controller_status.h>
+#include <uORB/topics/position_controller_setpoint.h>
 
 // *************************************
 
@@ -1254,6 +1255,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		struct attitude_controller_reference_s attitude_controller_reference;
 		struct controllers_mode_s controller_mode;
 		struct position_controller_status_s pos_controller_status;
+		struct position_controller_setpoint_s pos_controller_sp;
 
 		// ******************************************************
 	} buf;
@@ -1343,6 +1345,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_PCVY_s log_PCVY;				// Position controller status - vy
 			struct log_PCSZ_s log_PCSZ;				// Position controller status - z
 			struct log_PCVZ_s log_PCVZ;				// Position controller status - vz
+			struct log_PCSP_s log_PCSP;				// Position controller setpoint
 
 			// ******************************************************
 
@@ -1409,6 +1412,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int mcu_cmode_sub;
 		int commander_cmode_sub;
 		int pos_controller_status_sub;
+		int pos_controller_sp_sub;
 
 		// ******************************************************
 	} subs;
@@ -1467,6 +1471,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.mcu_cmode_sub = -1;
 	subs.commander_cmode_sub = -1;
 	subs.pos_controller_status_sub = -1;
+	subs.pos_controller_sp_sub = -1;
 
 	// ******************************************************
 
@@ -2736,7 +2741,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 			LOGBUFFER_WRITE_AND_COUNT(CCMD)
 		}
 
-
+		/* --- POSITION CONTROLLER STATUS --- */
 		if (check_sdlog2_configuration("position_controller_status") &&
 			copy_if_updated(ORB_ID(position_controller_status), &subs.pos_controller_status_sub, 
 				&buf.pos_controller_status)) {
@@ -2830,6 +2835,30 @@ int sdlog2_thread_main(int argc, char *argv[])
 			log_msg.body.log_PCVZ.out_d = buf.pos_controller_status.vz.output_derivative;
 			log_msg.body.log_PCVZ.mode = buf.pos_controller_status.vz.mode;
 			LOGBUFFER_WRITE_AND_COUNT(PCVZ)		
+		}
+
+		/* --- COMMANDER - POSITION CONTROLLER SETPOINT --- */
+		if (check_sdlog2_configuration("commander_position_controller_setpoint") && 
+			copy_if_updated(ORB_ID(commander_position_controller_setpoint), 
+				&subs.pos_controller_sp_sub, &buf.pos_controller_sp)) {
+
+			log_msg.msg_type = LOG_PCSP_MSG;
+			log_msg.body.log_PCSP.position_x = buf.pos_controller_sp.position_x;
+			log_msg.body.log_PCSP.position_y = buf.pos_controller_sp.position_y;
+			log_msg.body.log_PCSP.position_z = buf.pos_controller_sp.position_z;
+			log_msg.body.log_PCSP.velocity_x = buf.pos_controller_sp.velocity_x;
+			log_msg.body.log_PCSP.velocity_y = buf.pos_controller_sp.velocity_y;
+			log_msg.body.log_PCSP.velocity_z = buf.pos_controller_sp.velocity_z;
+			log_msg.body.log_PCSP.acceleration_x = buf.pos_controller_sp.acceleration_x;
+			log_msg.body.log_PCSP.acceleration_y = buf.pos_controller_sp.acceleration_y;
+			log_msg.body.log_PCSP.acceleration_z = buf.pos_controller_sp.acceleration_z;
+			log_msg.body.log_PCSP.roll = buf.pos_controller_sp.roll;
+			log_msg.body.log_PCSP.pitch = buf.pos_controller_sp.pitch;
+			log_msg.body.log_PCSP.yaw = buf.pos_controller_sp.yaw;
+			log_msg.body.log_PCSP.yaw_rate = buf.pos_controller_sp.yaw_rate;
+			log_msg.body.log_PCSP.yaw_manual_rpm = buf.pos_controller_sp.yaw_manual_rpm;
+			log_msg.body.log_PCSP.throttle = buf.pos_controller_sp.throttle;
+			LOGBUFFER_WRITE_AND_COUNT(PCSP)	
 		}
 
 		pthread_mutex_lock(&logbuffer_mutex);

@@ -962,8 +962,8 @@ struct log_PCSZ_s {
 	uint8_t mode; 			// Mode 
 };
 
-/* --- POSITION CONTROLLER STATUS - Y --- */
-#define LOG_PCVZ_MSG 80
+/* --- POSITION CONTROLLER STATUS - VZ --- */
+#define LOG_PCVZ_MSG 83
 struct log_PCVZ_s {
 	float p; 				// Proportional gain
 	float i; 				// Integral gain 
@@ -976,6 +976,26 @@ struct log_PCVZ_s {
 	float out_i;			// Output integral
 	float out_d;			// Output derivative
 	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLELER SETPOINT --- */
+#define LOG_PCSP_MSG 84
+struct log_PCSP_s {
+	float position_x;
+	float position_y;
+	float position_z;
+	float velocity_x;
+	float velocity_y;
+	float velocity_z;
+	float acceleration_x;
+	float acceleration_y;
+	float acceleration_z;
+	float roll;
+	float pitch;
+	float yaw;
+	float yaw_rate;
+	float yaw_manual_rpm;
+	float throttle;
 };
 
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
@@ -1093,6 +1113,7 @@ static const struct log_format_s log_formats[] = {
 	LOG_FORMAT(PCVY, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(PCSZ, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(PCVZ, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCSP, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,roll,pitch,yaw,yawR,yaw_manualRPM, trtl"),
 
 	// ***************************************
 
