@@ -1334,6 +1334,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_MCRE_s log_MCRE;				// MCU - controller reference
 			struct log_SMRE_s log_SMRE;				// Control-SM controller reference
 			struct log_MCMD_s log_MCMD;				// MCU - controllers mode
+			struct log_CCMD_s log_CCMD;				// Commander - controllers mode
 
 			// ******************************************************
 
@@ -1398,6 +1399,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int mcu_cref_sub;
 		int sm_cref_sub;
 		int mcu_cmode_sub;
+		int commander_cmode_sub;
 
 		// ******************************************************
 	} subs;
@@ -1454,7 +1456,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.mcu_cref_sub = -1;
 	subs.sm_cref_sub = -1;
 	subs.mcu_cmode_sub = -1;
-	
+	subs.commander_cmode_sub = -1;
+
 	// ******************************************************
 
 
@@ -2683,6 +2686,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 			LOGBUFFER_WRITE_AND_COUNT(ATCR);
 		}
 
+		/* --- MCU - CONTROLLERS MODE --- */
 		if (check_sdlog2_configuration("mcu_controllers_mode") && 
 			copy_if_updated(ORB_ID(mcu_controllers_mode), &subs.mcu_cmode_sub,
 			&buf.controller_mode)) {
@@ -2700,6 +2704,26 @@ int sdlog2_thread_main(int argc, char *argv[])
 			log_msg.body.log_MCMD.controller_yaw = buf.controller_mode.controller_yaw ? 1 : 0;
 			log_msg.body.log_MCMD.controller_yaw_rate = buf.controller_mode.controller_yaw_rate ? 1 : 0;				
 			LOGBUFFER_WRITE_AND_COUNT(MCMD)
+		}
+
+		/* --- COMMANDER - CONTROLLERS MODE --- */
+		if (check_sdlog2_configuration("commander_controllers_mode") && 
+			copy_if_updated(ORB_ID(commander_controllers_mode), &subs.commander_cmode_sub, 
+				&buf.controller_mode)) {
+
+			log_msg.msg_type = LOG_CCMD_MSG;
+			log_msg.body.log_CCMD.armed = buf.controller_mode.armed ? 1 : 0;
+			log_msg.body.log_CCMD.controller_x = buf.controller_mode.controller_x ? 1 : 0;
+			log_msg.body.log_CCMD.controller_y = buf.controller_mode.controller_y ? 1 : 0;
+			log_msg.body.log_CCMD.controller_z = buf.controller_mode.controller_z ? 1 : 0;
+			log_msg.body.log_CCMD.controller_velocity_x = buf.controller_mode.controller_velocity_x ? 1 : 0;
+			log_msg.body.log_CCMD.controller_velocity_y = buf.controller_mode.controller_velocity_y ? 1 : 0;
+			log_msg.body.log_CCMD.controller_velocity_z = buf.controller_mode.controller_velocity_z ? 1 : 0;
+			log_msg.body.log_CCMD.controller_roll = buf.controller_mode.controller_roll ? 1 : 0;
+			log_msg.body.log_CCMD.controller_pitch = buf.controller_mode.controller_pitch ? 1 : 0;
+			log_msg.body.log_CCMD.controller_yaw = buf.controller_mode.controller_yaw ? 1 : 0;
+			log_msg.body.log_CCMD.controller_yaw_rate = buf.controller_mode.controller_yaw_rate ? 1 : 0;
+			LOGBUFFER_WRITE_AND_COUNT(CCMD)
 		}
 
 		pthread_mutex_lock(&logbuffer_mutex);

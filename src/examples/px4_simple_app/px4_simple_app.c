@@ -72,7 +72,7 @@ int px4_simple_app_main(int argc, char *argv[])
 	struct controllers_mode_s data;
 	memset(&data, 0, sizeof(data));
 	//orb_advert_t att_pub = orb_advertise(ORB_ID(vehicle_attitude), &att);
-	orb_advert_t att_pub = orb_advertise(ORB_ID(mcu_controllers_mode), &data);
+	orb_advert_t att_pub = orb_advertise(ORB_ID(commander_controllers_mode), &data);
 
 	/* one could wait for multiple topics with this technique, just using one here */
 	px4_pollfd_struct_t fds[] = {
@@ -127,7 +127,7 @@ int px4_simple_app_main(int argc, char *argv[])
 				data.controller_y =  true;
 
 				//orb_publish(ORB_ID(vehicle_attitude), att_pub, &att);
-				orb_publish(ORB_ID(mcu_controllers_mode), att_pub, &data);
+				orb_publish(ORB_ID(commander_controllers_mode), att_pub, &data);
 			}
 
 			/* there could be more file descriptors here, in the form like:

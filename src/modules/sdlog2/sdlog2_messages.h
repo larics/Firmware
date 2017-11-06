@@ -866,6 +866,22 @@ struct log_MCMD_s {
 	int8_t controller_yaw_rate;
 };
 
+/* --- COMMANDER - CONTROLLERS MODE --- */
+#define LOG_CCMD_MSG 77
+struct log_CCMD_s {
+	int8_t armed;
+	int8_t controller_x;
+	int8_t controller_y;
+	int8_t controller_z;
+	int8_t controller_velocity_x;
+	int8_t controller_velocity_y;
+	int8_t controller_velocity_z;
+	int8_t controller_roll;
+	int8_t controller_pitch;
+	int8_t controller_yaw;
+	int8_t controller_yaw_rate;
+};
+
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
 
 /* --- TIME - TIME STAMP --- */
@@ -974,7 +990,8 @@ static const struct log_format_s log_formats[] = {
 	LOG_FORMAT(ASRV, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(ATCR, "fffffbbbbb", "roll,pitch,yaw,yawR,trtl,arm,rollCtl,pitchCtl,yawCtl,yawRCtl"),
 	LOG_FORMAT(MCMD, "bbbbbbbbbbb", "arm,c_x,c_y,c_z,cv_x,cv_y,cv_z,c_roll,c_pitch,c_yaw,c_yawR"),
-
+	LOG_FORMAT(CCMD, "bbbbbbbbbbb", "arm,c_x,c_y,c_z,cv_x,cv_y,cv_z,c_roll,c_pitch,c_yaw,c_yawR"),
+	
 	// ***************************************
 
 	/* system-level messages, ID >= 0x80 */
