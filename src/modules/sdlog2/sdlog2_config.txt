@@ -45,3 +45,4 @@ TOPIC=mcu_controllers_mode                      ENABLED=false
 TOPIC=commander_controllers_mode                ENABLED=false
 TOPIC=position_controller_status                ENABLED=true
 TOPIC=commander_position_controller_setpoint    ENABLED=true
+TOPIC=gas_motor_setpoint_array                  ENABLED=true

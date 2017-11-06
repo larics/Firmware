@@ -125,6 +125,7 @@
 #include <uORB/topics/controllers_mode.h>
 #include <uORB/topics/position_controller_status.h>
 #include <uORB/topics/position_controller_setpoint.h>
+#include <uORB/topics/gas_motor_setpoint_array.h>
 
 // *************************************
 
@@ -1256,6 +1257,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		struct controllers_mode_s controller_mode;
 		struct position_controller_status_s pos_controller_status;
 		struct position_controller_setpoint_s pos_controller_sp;
+		struct gas_motor_setpoint_array_s gas_motor_sp;
 
 		// ******************************************************
 	} buf;
@@ -1346,7 +1348,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_PCSZ_s log_PCSZ;				// Position controller status - z
 			struct log_PCVZ_s log_PCVZ;				// Position controller status - vz
 			struct log_PCSP_s log_PCSP;				// Position controller setpoint
-
+			struct log_GMSP_s log_GMSP;				// Gas motor setpoint array
 			// ******************************************************
 
 		} body;
@@ -1413,6 +1415,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int commander_cmode_sub;
 		int pos_controller_status_sub;
 		int pos_controller_sp_sub;
+		int gas_motor_sp_sub;
 
 		// ******************************************************
 	} subs;
@@ -1472,6 +1475,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.commander_cmode_sub = -1;
 	subs.pos_controller_status_sub = -1;
 	subs.pos_controller_sp_sub = -1;
+	subs.gas_motor_sp_sub = -1;
 
 	// ******************************************************
 
@@ -2860,6 +2864,20 @@ int sdlog2_thread_main(int argc, char *argv[])
 			log_msg.body.log_PCSP.throttle = buf.pos_controller_sp.throttle;
 			LOGBUFFER_WRITE_AND_COUNT(PCSP)	
 		}
+
+		/* --- GAS MOTOR SETPOINT ARRAY --- */
+		if (check_sdlog2_configuration("gas_motor_setpoint_array") && 
+			copy_if_updated(ORB_ID(gas_motor_setpoint_array), 
+				&subs.gas_motor_sp_sub, &buf.gas_motor_sp)) {
+
+			log_msg.msg_type = LOG_GMSP_MSG;
+			log_msg.body.log_GMSP.sp_front = buf.gas_motor_sp.setpoint[FRONT];
+			log_msg.body.log_GMSP.sp_back = buf.gas_motor_sp.setpoint[BACK];
+			log_msg.body.log_GMSP.sp_right = buf.gas_motor_sp.setpoint[RIGHT];
+			log_msg.body.log_GMSP.sp_left = buf.gas_motor_sp.setpoint[LEFT];
+			LOGBUFFER_WRITE_AND_COUNT(GMSP)				
+		}
+
 
 		pthread_mutex_lock(&logbuffer_mutex);
 

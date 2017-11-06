@@ -998,6 +998,15 @@ struct log_PCSP_s {
 	float throttle;
 };
 
+/* --- GAS MOTOR SETPOINT ARRAY --- */
+#define LOG_GMSP_MSG 85
+struct log_GMSP_s {
+	float sp_front;
+	float sp_back;
+	float sp_left;
+	float sp_right;
+};
+
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
 
 /* --- TIME - TIME STAMP --- */
@@ -1114,7 +1123,8 @@ static const struct log_format_s log_formats[] = {
 	LOG_FORMAT(PCSZ, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(PCVZ, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(PCSP, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,roll,pitch,yaw,yawR,yaw_manualRPM, trtl"),
-
+	LOG_FORMAT(GMSP, "ffff", "sp_front, sp_back, sp_left, sp_right"),
+	
 	// ***************************************
 
 	/* system-level messages, ID >= 0x80 */
