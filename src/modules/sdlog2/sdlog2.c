@@ -122,6 +122,7 @@
 #include <uORB/topics/attitude_controller_status.h>
 #include <uORB/topics/pid_status.h>
 #include <uORB/topics/attitude_controller_reference.h>
+#include <uORB/topics/controllers_mode.h>
 
 // *************************************
 
@@ -1250,6 +1251,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		struct controllers_reference_s controllers_reference;
 		struct attitude_controller_status_s attitude_controller_status;
 		struct attitude_controller_reference_s attitude_controller_reference;
+		struct controllers_mode_s controller_mode;
 
 		// ******************************************************
 	} buf;
@@ -1331,6 +1333,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_ATCR_s log_ATCR;				// Attitude controller reference
 			struct log_MCRE_s log_MCRE;				// MCU - controller reference
 			struct log_SMRE_s log_SMRE;				// Control-SM controller reference
+			struct log_MCMD_s log_MCMD;				// MCU - controllers mode
 
 			// ******************************************************
 
@@ -1394,6 +1397,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int att_control_ref_sub;
 		int mcu_cref_sub;
 		int sm_cref_sub;
+		int mcu_cmode_sub;
 
 		// ******************************************************
 	} subs;
@@ -1440,7 +1444,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.cpuload_sub = -1;
 	subs.diff_pres_sub = -1;
 	subs.low_stack_sub = -1;
-	
+
 	// Initialize additional topic subs
 	// ******************************************************
 	
@@ -1449,7 +1453,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.att_control_ref_sub = -1;
 	subs.mcu_cref_sub = -1;
 	subs.sm_cref_sub = -1;
-
+	subs.mcu_cmode_sub = -1;
+	
 	// ******************************************************
 
 
@@ -2678,6 +2683,24 @@ int sdlog2_thread_main(int argc, char *argv[])
 			LOGBUFFER_WRITE_AND_COUNT(ATCR);
 		}
 
+		if (check_sdlog2_configuration("mcu_controllers_mode") && 
+			copy_if_updated(ORB_ID(mcu_controllers_mode), &subs.mcu_cmode_sub,
+			&buf.controller_mode)) {
+
+			log_msg.msg_type = LOG_MCMD_MSG;
+			log_msg.body.log_MCMD.armed = buf.controller_mode.armed ? 1 : 0;
+			log_msg.body.log_MCMD.controller_x = buf.controller_mode.controller_x ? 1 : 0;
+			log_msg.body.log_MCMD.controller_y = buf.controller_mode.controller_y ? 1 : 0;
+			log_msg.body.log_MCMD.controller_z = buf.controller_mode.controller_z ? 1 : 0;
+			log_msg.body.log_MCMD.controller_velocity_x = buf.controller_mode.controller_velocity_x ? 1 : 0;
+			log_msg.body.log_MCMD.controller_velocity_y = buf.controller_mode.controller_velocity_y ? 1 : 0;
+			log_msg.body.log_MCMD.controller_velocity_z = buf.controller_mode.controller_velocity_z ? 1 : 0;
+			log_msg.body.log_MCMD.controller_roll = buf.controller_mode.controller_roll ? 1 : 0;
+			log_msg.body.log_MCMD.controller_pitch = buf.controller_mode.controller_pitch ? 1 : 0;
+			log_msg.body.log_MCMD.controller_yaw = buf.controller_mode.controller_yaw ? 1 : 0;
+			log_msg.body.log_MCMD.controller_yaw_rate = buf.controller_mode.controller_yaw_rate ? 1 : 0;				
+			LOGBUFFER_WRITE_AND_COUNT(MCMD)
+		}
 
 		pthread_mutex_lock(&logbuffer_mutex);
 
