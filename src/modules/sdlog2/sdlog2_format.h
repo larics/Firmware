@@ -78,7 +78,7 @@ Format characters in the format string for binary log messages
 struct log_format_s {
 	uint8_t type;
 	uint8_t length;		// full packet length including header 
-	char name[4];     // CHANGED: name length - 4 -> 6
+	char name[4];
 	char format[16];
 	char labels[64];
 };
