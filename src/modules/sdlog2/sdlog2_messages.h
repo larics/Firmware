@@ -667,6 +667,353 @@ struct log_CREF_s {
 	float throttle;
 };
 
+/* --- ATTITUDE CONTROLLER STATUS - ROLL --- */
+#define LOG_ACSR_MSG 65
+struct log_ACSR_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - ROLL-RATE --- */
+#define LOG_ASRR_MSG 66
+struct log_ASRR_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - PITCH --- */
+#define LOG_ACSP_MSG 67
+struct log_ACSP_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - PITCH-RATE --- */
+#define LOG_ASPR_MSG 68
+struct log_ASPR_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - YAW --- */
+#define LOG_ACSY_MSG 69
+struct log_ACSY_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* ATTITUDE CONTROLLER STATUS - YAW - RATE --- */
+#define LOG_ASYR_MSG 70
+struct log_ASYR_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - ROLL-RATE-VPC --- */
+#define LOG_ASRV_MSG 71
+struct log_ASRV_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER STATUS - PITCH-RATE-VPC --- */
+#define LOG_ASPV_MSG 72 
+struct log_ASPV_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- ATTITUDE CONTROLLER REFERENCE --- */
+#define LOG_ATCR_MSG 73
+struct log_ATCR_s {
+	float roll;
+	float pitch;
+	float yaw;
+	float yaw_rate;
+	float throttle;
+	int8_t armed; 			
+	int8_t roll_control;
+	int8_t pitch_control;
+	int8_t yaw_control;
+	int8_t yaw_rate_control;
+};
+
+/* --- MCU - CONTROLLER REFERENCE --- */
+#define LOG_MCRE_MSG 74
+struct log_MCRE_s {
+	float x;
+	float y;
+	float z;
+	float vx;
+	float vy;
+	float vz;
+	float ax;
+	float ay;
+	float az;
+	float yaw;
+	float vyaw;
+	float yaw_manual_rpm;
+	float roll;
+	float pitch;
+	float throttle;
+};
+
+/* --- CONTROL - SM CONTROLLERS REFERENCE --- */
+#define LOG_SMRE_MSG 75
+struct log_SMRE_s {
+	float x;
+	float y;
+	float z;
+	float vx;
+	float vy;
+	float vz;
+	float ax;
+	float ay;
+	float az;
+	float yaw;
+	float vyaw;
+	float yaw_manual_rpm;
+	float roll;
+	float pitch;
+	float throttle;
+};
+
+/* --- MCU - CONTROLLERS MODE --- */
+#define LOG_MCMD_MSG 76
+struct log_MCMD_s {
+	int8_t armed;
+	int8_t controller_x;
+	int8_t controller_y;
+	int8_t controller_z;
+	int8_t controller_velocity_x;
+	int8_t controller_velocity_y;
+	int8_t controller_velocity_z;
+	int8_t controller_roll;
+	int8_t controller_pitch;
+	int8_t controller_yaw;
+	int8_t controller_yaw_rate;
+};
+
+/* --- COMMANDER - CONTROLLERS MODE --- */
+#define LOG_CCMD_MSG 77
+struct log_CCMD_s {
+	int8_t armed;
+	int8_t controller_x;
+	int8_t controller_y;
+	int8_t controller_z;
+	int8_t controller_velocity_x;
+	int8_t controller_velocity_y;
+	int8_t controller_velocity_z;
+	int8_t controller_roll;
+	int8_t controller_pitch;
+	int8_t controller_yaw;
+	int8_t controller_yaw_rate;
+};
+
+/* --- POSITION CONTROLLER STATUS - X --- */
+#define LOG_PCSX_MSG 78
+struct log_PCSX_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - VX --- */
+#define LOG_PCVX_MSG 79
+struct log_PCVX_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - Y --- */
+#define LOG_PCSY_MSG 80
+struct log_PCSY_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - VY --- */
+#define LOG_PCVY_MSG 81
+struct log_PCVY_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - Z --- */
+#define LOG_PCSZ_MSG 82
+struct log_PCSZ_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLLER STATUS - VZ --- */
+#define LOG_PCVZ_MSG 83
+struct log_PCVZ_s {
+	float p; 				// Proportional gain
+	float i; 				// Integral gain 
+	float d;				// Derivative gain 
+	float sample_rate;		// Sample rate
+	float sp;				// Setpoint
+	float feedback; 		// Feedback
+	float out;				// Output
+	float out_p;			// Output proportional
+	float out_i;			// Output integral
+	float out_d;			// Output derivative
+	uint8_t mode; 			// Mode 
+};
+
+/* --- POSITION CONTROLELER SETPOINT --- */
+#define LOG_PCSP_MSG 84
+struct log_PCSP_s {
+	float position_x;
+	float position_y;
+	float position_z;
+	float velocity_x;
+	float velocity_y;
+	float velocity_z;
+	float acceleration_x;
+	float acceleration_y;
+	float acceleration_z;
+	float roll;
+	float pitch;
+	float yaw;
+	float yaw_rate;
+	float yaw_manual_rpm;
+	float throttle;
+};
+
+/* --- GAS MOTOR SETPOINT ARRAY --- */
+#define LOG_GMSP_MSG 85
+struct log_GMSP_s {
+	float sp_front;
+	float sp_back;
+	float sp_left;
+	float sp_right;
+};
+
+/* --- COMMANDER GAS MOTOR IGNITION REFERENCE --- */
+#define LOG_MIRE_MSG 86
+struct log_MIRE_s {
+	uint8_t id;
+	uint8_t ignition;
+};
+
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
 
 /* --- TIME - TIME STAMP --- */
@@ -759,8 +1106,34 @@ static const struct log_format_s log_formats[] = {
 	LOG_FORMAT(DPRS, "Qffff", "errors,DPRESraw,DPRES,DPRESmax,Temp"),
 	LOG_FORMAT(STCK, "NH", "Task,Free"),
 
-	// Add controller reference message format
+	// Additional topic messages formatting
+	// ***************************************
+	
 	LOG_FORMAT(CREF, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,yaw,vYaw,yawRpm,roll,pitch,thrtl"),
+	LOG_FORMAT(MCRE, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,yaw,vYaw,yawRpm,roll,pitch,thrtl"),
+	LOG_FORMAT(SMRE, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,yaw,vYaw,yawRpm,roll,pitch,thrtl"),
+	LOG_FORMAT(ACSR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASRR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ACSP, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASPR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ACSY, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASYR, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASPV, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ASRV, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(ATCR, "fffffbbbbb", "roll,pitch,yaw,yawR,trtl,arm,rollCtl,pitchCtl,yawCtl,yawRCtl"),
+	LOG_FORMAT(MCMD, "bbbbbbbbbbb", "arm,c_x,c_y,c_z,cv_x,cv_y,cv_z,c_roll,c_pitch,c_yaw,c_yawR"),
+	LOG_FORMAT(CCMD, "bbbbbbbbbbb", "arm,c_x,c_y,c_z,cv_x,cv_y,cv_z,c_roll,c_pitch,c_yaw,c_yawR"),
+	LOG_FORMAT(PCSX, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCVX, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCSY, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCVY, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCSZ, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCVZ, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
+	LOG_FORMAT(PCSP, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,roll,pitch,yaw,yawR,yaw_manualRPM, trtl"),
+	LOG_FORMAT(GMSP, "ffff", "sp_front, sp_back, sp_left, sp_right"),
+	LOG_FORMAT(MIRE, "bb", "id,ignition"),
+	
+	// ***************************************
 
 	/* system-level messages, ID >= 0x80 */
 	/* FMT: don't write format of format message, it's useless */

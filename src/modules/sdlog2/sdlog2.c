@@ -119,6 +119,14 @@
 // *************************************
 
 #include <uORB/topics/controllers_reference.h>
+#include <uORB/topics/attitude_controller_status.h>
+#include <uORB/topics/pid_status.h>
+#include <uORB/topics/attitude_controller_reference.h>
+#include <uORB/topics/controllers_mode.h>
+#include <uORB/topics/position_controller_status.h>
+#include <uORB/topics/position_controller_setpoint.h>
+#include <uORB/topics/gas_motor_setpoint_array.h>
+#include <uORB/topics/gas_motor_ignition_reference.h>
 
 // *************************************
 
@@ -1241,8 +1249,19 @@ int sdlog2_thread_main(int argc, char *argv[])
 		struct vehicle_gps_position_s dual_gps_pos;
 		struct low_stack_s low_stack;
 		
-		// Added controllers reference to buffer
+		// Adding additional topic structures
+		// ******************************************************
+		
 		struct controllers_reference_s controllers_reference;
+		struct attitude_controller_status_s attitude_controller_status;
+		struct attitude_controller_reference_s attitude_controller_reference;
+		struct controllers_mode_s controller_mode;
+		struct position_controller_status_s pos_controller_status;
+		struct position_controller_setpoint_s pos_controller_sp;
+		struct gas_motor_setpoint_array_s gas_motor_sp;
+		struct gas_motor_ignition_reference_s gas_motor_ref;
+
+		// ******************************************************
 	} buf;
 
 	memset(&buf, 0, sizeof(buf));
@@ -1307,8 +1326,35 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_DPRS_s log_DPRS;
 			struct log_STCK_s log_STCK;
 
-			// Add controller reference to message body
-			struct log_CREF_s log_CREF;
+			// Adding additional topic bodies
+			// ******************************************************
+
+			struct log_CREF_s log_CREF; 			// Controller reference
+			struct log_ACSR_s log_ACSR;				// Attitude controller status - roll
+			struct log_ASRR_s log_ASRR;				// Attitude controller status - roll - rate
+			struct log_ACSP_s log_ACSP;				// Attitude controller status - pitch
+			struct log_ASPR_s log_ASPR;				// Attitude controller status - pitch - rate
+			struct log_ACSY_s log_ACSY;				// Attitude controller status - yaw
+			struct log_ASYR_s log_ASYR;				// Attitude controller status - yaw - rate
+			struct log_ASRV_s log_ASRV;				// Attitude controller status - roll - rate - vpc
+			struct log_ASPV_s log_ASPV;				// Attitude controller status - pitch - rate - vpc
+			struct log_ATCR_s log_ATCR;				// Attitude controller reference
+			struct log_MCRE_s log_MCRE;				// MCU - controller reference
+			struct log_SMRE_s log_SMRE;				// Control-SM controller reference
+			struct log_MCMD_s log_MCMD;				// MCU - controllers mode
+			struct log_CCMD_s log_CCMD;				// Commander - controllers mode
+			struct log_PCSX_s log_PCSX; 			// Position controller status - x
+			struct log_PCVX_s log_PCVX;				// Position controller status - vx
+			struct log_PCSY_s log_PCSY;				// Position controller status - y
+			struct log_PCVY_s log_PCVY;				// Position controller status - vy
+			struct log_PCSZ_s log_PCSZ;				// Position controller status - z
+			struct log_PCVZ_s log_PCVZ;				// Position controller status - vz
+			struct log_PCSP_s log_PCSP;				// Position controller setpoint
+			struct log_GMSP_s log_GMSP;				// Gas motor setpoint array
+			struct log_MIRE_s log_MIRE;				// Gas motor ignition reference
+
+			// ******************************************************
+
 		} body;
 	} log_msg = {
 		LOG_PACKET_HEADER_INIT(0)
@@ -1361,8 +1407,22 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int diff_pres_sub;
 		int low_stack_sub;
 
-		// Add controller reference to sub
+		// Add additional topic subs
+		// ******************************************************
+		
 		int cref_sub;
+		int att_control_status_sub;
+		int att_control_ref_sub;
+		int mcu_cref_sub;
+		int sm_cref_sub;
+		int mcu_cmode_sub;
+		int commander_cmode_sub;
+		int pos_controller_status_sub;
+		int pos_controller_sp_sub;
+		int gas_motor_sp_sub;
+		int gas_motor_ref_sub;
+
+		// ******************************************************
 	} subs;
 
 	subs.cmd_sub = -1;
@@ -1407,12 +1467,26 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.cpuload_sub = -1;
 	subs.diff_pres_sub = -1;
 	subs.low_stack_sub = -1;
-	subs.cref_sub = -1;
+
+	// Initialize additional topic subs
+	// ******************************************************
 	
-	//TODO topics
+	subs.cref_sub = -1;
+	subs.att_control_status_sub = -1;
+	subs.att_control_ref_sub = -1;
+	subs.mcu_cref_sub = -1;
+	subs.sm_cref_sub = -1;
+	subs.mcu_cmode_sub = -1;
+	subs.commander_cmode_sub = -1;
+	subs.pos_controller_status_sub = -1;
+	subs.pos_controller_sp_sub = -1;
+	subs.gas_motor_sp_sub = -1;
+	subs.gas_motor_ref_sub = -1;
+
+	// ******************************************************
+
+
 	/* add new topics HERE */
-
-
 	for (unsigned i = 0; i < ORB_MULTI_MAX_INSTANCES; i++) {
 		subs.telemetry_subs[i] = -1;
 	}
@@ -2436,21 +2510,14 @@ int sdlog2_thread_main(int argc, char *argv[])
 			copy_if_updated(ORB_ID(controllers_reference), &subs.cref_sub, &buf.controllers_reference)) {
 			log_msg.msg_type = LOG_CREF_MSG;
 
-			// Position 
 			log_msg.body.log_CREF.x = buf.controllers_reference.x;
 			log_msg.body.log_CREF.y = buf.controllers_reference.y;
 			log_msg.body.log_CREF.z = buf.controllers_reference.z;
-			
-			// Velocity
-			log_msg.body.log_CREF.vx = buf.controllers_reference.vx;
 			log_msg.body.log_CREF.vy = buf.controllers_reference.vy;
 			log_msg.body.log_CREF.vz = buf.controllers_reference.vz;
-
-
 			log_msg.body.log_CREF.yaw = buf.controllers_reference.yaw;
 			log_msg.body.log_CREF.vyaw = buf.controllers_reference.vyaw;
 			log_msg.body.log_CREF.yaw_manual_rpm = buf.controllers_reference.yaw_manual_rpm;
-			
 			log_msg.body.log_CREF.roll = buf.controllers_reference.roll;
 			log_msg.body.log_CREF.pitch = buf.controllers_reference.pitch;
 			log_msg.body.log_CREF.throttle = buf.controllers_reference.throttle;
@@ -2458,6 +2525,375 @@ int sdlog2_thread_main(int argc, char *argv[])
 			LOGBUFFER_WRITE_AND_COUNT(CREF)				
 		}
 
+		/* --- MCU - CONTROLLER REFERENCE --- */
+		if (check_sdlog2_configuration("mcu_controllers_reference") && 
+			copy_if_updated(ORB_ID(mcu_controllers_reference), &subs.mcu_cref_sub, &buf.controllers_reference)) {
+			log_msg.msg_type = LOG_MCRE_MSG;
+
+			log_msg.body.log_MCRE.x = buf.controllers_reference.x;
+			log_msg.body.log_MCRE.y = buf.controllers_reference.y;
+			log_msg.body.log_MCRE.z = buf.controllers_reference.z;
+			log_msg.body.log_MCRE.vy = buf.controllers_reference.vy;
+			log_msg.body.log_MCRE.vz = buf.controllers_reference.vz;
+			log_msg.body.log_MCRE.yaw = buf.controllers_reference.yaw;
+			log_msg.body.log_MCRE.vyaw = buf.controllers_reference.vyaw;
+			log_msg.body.log_MCRE.yaw_manual_rpm = buf.controllers_reference.yaw_manual_rpm;
+			log_msg.body.log_MCRE.roll = buf.controllers_reference.roll;
+			log_msg.body.log_MCRE.pitch = buf.controllers_reference.pitch;
+			log_msg.body.log_MCRE.throttle = buf.controllers_reference.throttle;
+
+			LOGBUFFER_WRITE_AND_COUNT(MCRE)
+		}
+
+		/* --- SM - CONTROLLER REFERENCE --- */
+		if (check_sdlog2_configuration("ctrl_sm_controllers_reference") && 
+			copy_if_updated(ORB_ID(ctrl_sm_controllers_reference), &subs.sm_cref_sub, 
+				&buf.controllers_reference)) {
+			log_msg.msg_type = LOG_SMRE_MSG;
+
+			log_msg.body.log_SMRE.x = buf.controllers_reference.x;
+			log_msg.body.log_SMRE.y = buf.controllers_reference.y;
+			log_msg.body.log_SMRE.z = buf.controllers_reference.z;
+			log_msg.body.log_SMRE.vy = buf.controllers_reference.vy;
+			log_msg.body.log_SMRE.vz = buf.controllers_reference.vz;
+			log_msg.body.log_SMRE.yaw = buf.controllers_reference.yaw;
+			log_msg.body.log_SMRE.vyaw = buf.controllers_reference.vyaw;
+			log_msg.body.log_SMRE.yaw_manual_rpm = buf.controllers_reference.yaw_manual_rpm;
+			log_msg.body.log_SMRE.roll = buf.controllers_reference.roll;
+			log_msg.body.log_SMRE.pitch = buf.controllers_reference.pitch;
+			log_msg.body.log_SMRE.throttle = buf.controllers_reference.throttle;
+
+			LOGBUFFER_WRITE_AND_COUNT(SMRE)
+		}
+
+		/* --- CONTROLLER ATTITUDE STATUS --- */
+		if (check_sdlog2_configuration("attitude_controller_status") && 
+			copy_if_updated(ORB_ID(attitude_controller_status), &subs.att_control_status_sub, 
+				&buf.attitude_controller_status)) {	
+
+			// Roll
+			log_msg.msg_type = LOG_ACSR_MSG;
+			log_msg.body.log_ACSR.p = buf.attitude_controller_status.roll.gain_proportional;
+			log_msg.body.log_ACSR.i = buf.attitude_controller_status.roll.gain_integral;
+			log_msg.body.log_ACSR.d = buf.attitude_controller_status.roll.gain_derivative;
+			log_msg.body.log_ACSR.sample_rate = buf.attitude_controller_status.roll.sample_rate;
+			log_msg.body.log_ACSR.sp = buf.attitude_controller_status.roll.setpoint;
+			log_msg.body.log_ACSR.feedback = buf.attitude_controller_status.roll.feedback;
+			log_msg.body.log_ACSR.out = buf.attitude_controller_status.roll.output;
+			log_msg.body.log_ACSR.out_p = buf.attitude_controller_status.roll.output_proportional;
+			log_msg.body.log_ACSR.out_i = buf.attitude_controller_status.roll.output_integral;
+			log_msg.body.log_ACSR.out_d = buf.attitude_controller_status.roll.output_derivative;
+			log_msg.body.log_ACSR.mode = buf.attitude_controller_status.roll.mode;
+			LOGBUFFER_WRITE_AND_COUNT(ACSR)
+
+			// Roll rate				
+			log_msg.msg_type = LOG_ASRR_MSG;
+			log_msg.body.log_ASRR.p = buf.attitude_controller_status.roll_rate.gain_proportional;
+			log_msg.body.log_ASRR.i = buf.attitude_controller_status.roll_rate.gain_integral;
+			log_msg.body.log_ASRR.d = buf.attitude_controller_status.roll_rate.gain_derivative;
+			log_msg.body.log_ASRR.sample_rate = buf.attitude_controller_status.roll_rate.sample_rate;
+			log_msg.body.log_ASRR.sp = buf.attitude_controller_status.roll_rate.setpoint;
+			log_msg.body.log_ASRR.feedback = buf.attitude_controller_status.roll_rate.feedback;
+			log_msg.body.log_ASRR.out = buf.attitude_controller_status.roll_rate.output;
+			log_msg.body.log_ASRR.out_p = buf.attitude_controller_status.roll_rate.output_proportional;
+			log_msg.body.log_ASRR.out_i = buf.attitude_controller_status.roll_rate.output_integral;
+			log_msg.body.log_ASRR.out_d = buf.attitude_controller_status.roll_rate.output_derivative;
+			log_msg.body.log_ASRR.mode = buf.attitude_controller_status.roll_rate.mode;
+			LOGBUFFER_WRITE_AND_COUNT(ASRR)
+			
+			// Pitch
+			log_msg.msg_type = LOG_ACSP_MSG;
+			log_msg.body.log_ACSP.p = buf.attitude_controller_status.pitch.gain_proportional;
+			log_msg.body.log_ACSP.i = buf.attitude_controller_status.pitch.gain_integral;
+			log_msg.body.log_ACSP.d = buf.attitude_controller_status.pitch.gain_derivative;
+			log_msg.body.log_ACSP.sample_rate = buf.attitude_controller_status.pitch.sample_rate;
+			log_msg.body.log_ACSP.sp = buf.attitude_controller_status.pitch.setpoint;
+			log_msg.body.log_ACSP.feedback = buf.attitude_controller_status.pitch.feedback;
+			log_msg.body.log_ACSP.out = buf.attitude_controller_status.pitch.output;
+			log_msg.body.log_ACSP.out_p = buf.attitude_controller_status.pitch.output_proportional;
+			log_msg.body.log_ACSP.out_i = buf.attitude_controller_status.pitch.output_integral;
+			log_msg.body.log_ACSP.out_d = buf.attitude_controller_status.pitch.output_derivative;
+			log_msg.body.log_ACSP.mode = buf.attitude_controller_status.pitch.mode;
+			LOGBUFFER_WRITE_AND_COUNT(ACSP)
+
+			// Pitch rate
+			log_msg.msg_type = LOG_ASPR_MSG;
+			log_msg.body.log_ASPR.p = buf.attitude_controller_status.pitch_rate.gain_proportional;
+			log_msg.body.log_ASPR.i = buf.attitude_controller_status.pitch_rate.gain_integral;
+			log_msg.body.log_ASPR.d = buf.attitude_controller_status.pitch_rate.gain_derivative;
+			log_msg.body.log_ASPR.sample_rate = buf.attitude_controller_status.pitch_rate.sample_rate;
+			log_msg.body.log_ASPR.sp = buf.attitude_controller_status.pitch_rate.setpoint;
+			log_msg.body.log_ASPR.feedback = buf.attitude_controller_status.pitch_rate.feedback;
+			log_msg.body.log_ASPR.out = buf.attitude_controller_status.pitch_rate.output;
+			log_msg.body.log_ASPR.out_p = buf.attitude_controller_status.pitch_rate.output_proportional;
+			log_msg.body.log_ASPR.out_i = buf.attitude_controller_status.pitch_rate.output_integral;
+			log_msg.body.log_ASPR.out_d = buf.attitude_controller_status.pitch_rate.output_derivative;
+			log_msg.body.log_ASPR.mode = buf.attitude_controller_status.pitch_rate.mode;
+			LOGBUFFER_WRITE_AND_COUNT(ASPR)
+
+			// Yaw
+			log_msg.msg_type = LOG_ACSY_MSG;
+			log_msg.body.log_ACSY.p = buf.attitude_controller_status.yaw.gain_proportional;
+			log_msg.body.log_ACSY.i = buf.attitude_controller_status.yaw.gain_integral;
+			log_msg.body.log_ACSY.d = buf.attitude_controller_status.yaw.gain_derivative;
+			log_msg.body.log_ACSY.sample_rate = buf.attitude_controller_status.yaw.sample_rate;
+			log_msg.body.log_ACSY.sp = buf.attitude_controller_status.yaw.setpoint;
+			log_msg.body.log_ACSY.feedback = buf.attitude_controller_status.yaw.feedback;
+			log_msg.body.log_ACSY.out = buf.attitude_controller_status.yaw.output;
+			log_msg.body.log_ACSY.out_p = buf.attitude_controller_status.yaw.output_proportional;
+			log_msg.body.log_ACSY.out_i = buf.attitude_controller_status.yaw.output_integral;
+			log_msg.body.log_ACSY.out_d = buf.attitude_controller_status.yaw.output_derivative;
+			log_msg.body.log_ACSY.mode = buf.attitude_controller_status.yaw.mode;
+			LOGBUFFER_WRITE_AND_COUNT(ACSY)
+
+			// Yaw rate				
+			log_msg.msg_type = LOG_ASYR_MSG;
+			log_msg.body.log_ASYR.p = buf.attitude_controller_status.yaw_rate.gain_proportional;
+			log_msg.body.log_ASYR.i = buf.attitude_controller_status.yaw_rate.gain_integral;
+			log_msg.body.log_ASYR.d = buf.attitude_controller_status.yaw_rate.gain_derivative;
+			log_msg.body.log_ASYR.sample_rate = buf.attitude_controller_status.yaw_rate.sample_rate;
+			log_msg.body.log_ASYR.sp = buf.attitude_controller_status.yaw_rate.setpoint;
+			log_msg.body.log_ASYR.feedback = buf.attitude_controller_status.yaw_rate.feedback;
+			log_msg.body.log_ASYR.out = buf.attitude_controller_status.yaw_rate.output;
+			log_msg.body.log_ASYR.out_p = buf.attitude_controller_status.yaw_rate.output_proportional;
+			log_msg.body.log_ASYR.out_i = buf.attitude_controller_status.yaw_rate.output_integral;
+			log_msg.body.log_ASYR.out_d = buf.attitude_controller_status.yaw_rate.output_derivative;
+			log_msg.body.log_ASYR.mode = buf.attitude_controller_status.yaw_rate.mode;
+			LOGBUFFER_WRITE_AND_COUNT(ASYR)
+
+			// Roll rate vpc
+			log_msg.msg_type = LOG_ASRV_MSG;
+			log_msg.body.log_ASRV.p = buf.attitude_controller_status.roll_rate_vpc.gain_proportional;
+			log_msg.body.log_ASRV.i = buf.attitude_controller_status.roll_rate_vpc.gain_integral;
+			log_msg.body.log_ASRV.d = buf.attitude_controller_status.roll_rate_vpc.gain_derivative;
+			log_msg.body.log_ASRV.sample_rate = buf.attitude_controller_status.roll_rate_vpc.sample_rate;
+			log_msg.body.log_ASRV.sp = buf.attitude_controller_status.roll_rate_vpc.setpoint;
+			log_msg.body.log_ASRV.feedback = buf.attitude_controller_status.roll_rate_vpc.feedback;
+			log_msg.body.log_ASRV.out = buf.attitude_controller_status.roll_rate_vpc.output;
+			log_msg.body.log_ASRV.out_p = buf.attitude_controller_status.roll_rate_vpc.output_proportional;
+			log_msg.body.log_ASRV.out_i = buf.attitude_controller_status.roll_rate_vpc.output_integral;
+			log_msg.body.log_ASRV.out_d = buf.attitude_controller_status.roll_rate_vpc.output_derivative;
+			log_msg.body.log_ASRV.mode = buf.attitude_controller_status.roll_rate_vpc.mode;
+			LOGBUFFER_WRITE_AND_COUNT(ASRV)
+
+			// Pitch rate vpc
+			log_msg.msg_type = LOG_ASPV_MSG;
+			log_msg.body.log_ASPV.p = buf.attitude_controller_status.pitch_rate_vpc.gain_proportional;
+			log_msg.body.log_ASPV.i = buf.attitude_controller_status.pitch_rate_vpc.gain_integral;
+			log_msg.body.log_ASPV.d = buf.attitude_controller_status.pitch_rate_vpc.gain_derivative;
+			log_msg.body.log_ASPV.sample_rate = buf.attitude_controller_status.pitch_rate_vpc.sample_rate;
+			log_msg.body.log_ASPV.sp = buf.attitude_controller_status.pitch_rate_vpc.setpoint;
+			log_msg.body.log_ASPV.feedback = buf.attitude_controller_status.pitch_rate_vpc.feedback;
+			log_msg.body.log_ASPV.out = buf.attitude_controller_status.pitch_rate_vpc.output;
+			log_msg.body.log_ASPV.out_p = buf.attitude_controller_status.pitch_rate_vpc.output_proportional;
+			log_msg.body.log_ASPV.out_i = buf.attitude_controller_status.pitch_rate_vpc.output_integral;
+			log_msg.body.log_ASPV.out_d = buf.attitude_controller_status.pitch_rate_vpc.output_derivative;
+			log_msg.body.log_ASPV.mode = buf.attitude_controller_status.pitch_rate_vpc.mode;
+			LOGBUFFER_WRITE_AND_COUNT(ASPV)		
+		}
+
+		/* --- ATTITUDE CONTROLLER REFERENCE --- */
+		if (check_sdlog2_configuration("attitude_controller_reference") &&
+			copy_if_updated(ORB_ID(attitude_controller_reference), &subs.att_control_ref_sub, 
+				&buf.attitude_controller_reference)) {
+			
+			log_msg.msg_type = LOG_ATCR_MSG;
+			log_msg.body.log_ATCR.roll = buf.attitude_controller_reference.roll;
+			log_msg.body.log_ATCR.pitch = buf.attitude_controller_reference.pitch;
+			log_msg.body.log_ATCR.yaw = buf.attitude_controller_reference.yaw;
+			log_msg.body.log_ATCR.yaw_rate = buf.attitude_controller_reference.yaw_rate;
+			log_msg.body.log_ATCR.throttle = buf.attitude_controller_reference.throttle;
+			log_msg.body.log_ATCR.armed = buf.attitude_controller_reference.armed ? 1 : 0;
+			log_msg.body.log_ATCR.roll_control = buf.attitude_controller_reference.roll_control ? 1 : 0;
+			log_msg.body.log_ATCR.pitch_control = buf.attitude_controller_reference.pitch_control ? 1 : 0;
+			log_msg.body.log_ATCR.yaw_control = buf.attitude_controller_reference.yaw_control ? 1 : 0;	
+			log_msg.body.log_ATCR.yaw_rate_control = buf.attitude_controller_reference.yaw_rate_control ? 1 : 0;	
+			LOGBUFFER_WRITE_AND_COUNT(ATCR);
+		}
+
+		/* --- MCU - CONTROLLERS MODE --- */
+		if (check_sdlog2_configuration("mcu_controllers_mode") && 
+			copy_if_updated(ORB_ID(mcu_controllers_mode), &subs.mcu_cmode_sub,
+			&buf.controller_mode)) {
+
+			log_msg.msg_type = LOG_MCMD_MSG;
+			log_msg.body.log_MCMD.armed = buf.controller_mode.armed ? 1 : 0;
+			log_msg.body.log_MCMD.controller_x = buf.controller_mode.controller_x ? 1 : 0;
+			log_msg.body.log_MCMD.controller_y = buf.controller_mode.controller_y ? 1 : 0;
+			log_msg.body.log_MCMD.controller_z = buf.controller_mode.controller_z ? 1 : 0;
+			log_msg.body.log_MCMD.controller_velocity_x = buf.controller_mode.controller_velocity_x ? 1 : 0;
+			log_msg.body.log_MCMD.controller_velocity_y = buf.controller_mode.controller_velocity_y ? 1 : 0;
+			log_msg.body.log_MCMD.controller_velocity_z = buf.controller_mode.controller_velocity_z ? 1 : 0;
+			log_msg.body.log_MCMD.controller_roll = buf.controller_mode.controller_roll ? 1 : 0;
+			log_msg.body.log_MCMD.controller_pitch = buf.controller_mode.controller_pitch ? 1 : 0;
+			log_msg.body.log_MCMD.controller_yaw = buf.controller_mode.controller_yaw ? 1 : 0;
+			log_msg.body.log_MCMD.controller_yaw_rate = buf.controller_mode.controller_yaw_rate ? 1 : 0;				
+			LOGBUFFER_WRITE_AND_COUNT(MCMD)
+		}
+
+		/* --- COMMANDER - CONTROLLERS MODE --- */
+		if (check_sdlog2_configuration("commander_controllers_mode") && 
+			copy_if_updated(ORB_ID(commander_controllers_mode), &subs.commander_cmode_sub, 
+				&buf.controller_mode)) {
+
+			log_msg.msg_type = LOG_CCMD_MSG;
+			log_msg.body.log_CCMD.armed = buf.controller_mode.armed ? 1 : 0;
+			log_msg.body.log_CCMD.controller_x = buf.controller_mode.controller_x ? 1 : 0;
+			log_msg.body.log_CCMD.controller_y = buf.controller_mode.controller_y ? 1 : 0;
+			log_msg.body.log_CCMD.controller_z = buf.controller_mode.controller_z ? 1 : 0;
+			log_msg.body.log_CCMD.controller_velocity_x = buf.controller_mode.controller_velocity_x ? 1 : 0;
+			log_msg.body.log_CCMD.controller_velocity_y = buf.controller_mode.controller_velocity_y ? 1 : 0;
+			log_msg.body.log_CCMD.controller_velocity_z = buf.controller_mode.controller_velocity_z ? 1 : 0;
+			log_msg.body.log_CCMD.controller_roll = buf.controller_mode.controller_roll ? 1 : 0;
+			log_msg.body.log_CCMD.controller_pitch = buf.controller_mode.controller_pitch ? 1 : 0;
+			log_msg.body.log_CCMD.controller_yaw = buf.controller_mode.controller_yaw ? 1 : 0;
+			log_msg.body.log_CCMD.controller_yaw_rate = buf.controller_mode.controller_yaw_rate ? 1 : 0;
+			LOGBUFFER_WRITE_AND_COUNT(CCMD)
+		}
+
+		/* --- POSITION CONTROLLER STATUS --- */
+		if (check_sdlog2_configuration("position_controller_status") &&
+			copy_if_updated(ORB_ID(position_controller_status), &subs.pos_controller_status_sub, 
+				&buf.pos_controller_status)) {
+
+			// X
+			log_msg.msg_type = LOG_PCSX_MSG;
+			log_msg.body.log_PCSX.p = buf.pos_controller_status.x.gain_proportional;
+			log_msg.body.log_PCSX.i = buf.pos_controller_status.x.gain_integral;
+			log_msg.body.log_PCSX.d = buf.pos_controller_status.x.gain_derivative;
+			log_msg.body.log_PCSX.sample_rate = buf.pos_controller_status.x.sample_rate;
+			log_msg.body.log_PCSX.sp = buf.pos_controller_status.x.setpoint;
+			log_msg.body.log_PCSX.feedback = buf.pos_controller_status.x.feedback;
+			log_msg.body.log_PCSX.out = buf.pos_controller_status.x.output;
+			log_msg.body.log_PCSX.out_p = buf.pos_controller_status.x.output_proportional;
+			log_msg.body.log_PCSX.out_i = buf.pos_controller_status.x.output_integral;
+			log_msg.body.log_PCSX.out_d = buf.pos_controller_status.x.output_derivative;
+			log_msg.body.log_PCSX.mode = buf.pos_controller_status.x.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCSX)
+
+			// VX
+			log_msg.msg_type = LOG_PCVX_MSG;
+			log_msg.body.log_PCVX.p = buf.pos_controller_status.vx.gain_proportional;
+			log_msg.body.log_PCVX.i = buf.pos_controller_status.vx.gain_integral;
+			log_msg.body.log_PCVX.d = buf.pos_controller_status.vx.gain_derivative;
+			log_msg.body.log_PCVX.sample_rate = buf.pos_controller_status.vx.sample_rate;
+			log_msg.body.log_PCVX.sp = buf.pos_controller_status.vx.setpoint;
+			log_msg.body.log_PCVX.feedback = buf.pos_controller_status.vx.feedback;
+			log_msg.body.log_PCVX.out = buf.pos_controller_status.vx.output;
+			log_msg.body.log_PCVX.out_p = buf.pos_controller_status.vx.output_proportional;
+			log_msg.body.log_PCVX.out_i = buf.pos_controller_status.vx.output_integral;
+			log_msg.body.log_PCVX.out_d = buf.pos_controller_status.vx.output_derivative;
+			log_msg.body.log_PCVX.mode = buf.pos_controller_status.vx.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCVX)		
+
+			// Y
+			log_msg.msg_type = LOG_PCSY_MSG;
+			log_msg.body.log_PCSY.p = buf.pos_controller_status.y.gain_proportional;
+			log_msg.body.log_PCSY.i = buf.pos_controller_status.y.gain_integral;
+			log_msg.body.log_PCSY.d = buf.pos_controller_status.y.gain_derivative;
+			log_msg.body.log_PCSY.sample_rate = buf.pos_controller_status.y.sample_rate;
+			log_msg.body.log_PCSY.sp = buf.pos_controller_status.y.setpoint;
+			log_msg.body.log_PCSY.feedback = buf.pos_controller_status.y.feedback;
+			log_msg.body.log_PCSY.out = buf.pos_controller_status.y.output;
+			log_msg.body.log_PCSY.out_p = buf.pos_controller_status.y.output_proportional;
+			log_msg.body.log_PCSY.out_i = buf.pos_controller_status.y.output_integral;
+			log_msg.body.log_PCSY.out_d = buf.pos_controller_status.y.output_derivative;
+			log_msg.body.log_PCSY.mode = buf.pos_controller_status.y.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCSY)
+
+			// VY
+			log_msg.msg_type = LOG_PCVY_MSG;
+			log_msg.body.log_PCVY.p = buf.pos_controller_status.vy.gain_proportional;
+			log_msg.body.log_PCVY.i = buf.pos_controller_status.vy.gain_integral;
+			log_msg.body.log_PCVY.d = buf.pos_controller_status.vy.gain_derivative;
+			log_msg.body.log_PCVY.sample_rate = buf.pos_controller_status.vy.sample_rate;
+			log_msg.body.log_PCVY.sp = buf.pos_controller_status.vy.setpoint;
+			log_msg.body.log_PCVY.feedback = buf.pos_controller_status.vy.feedback;
+			log_msg.body.log_PCVY.out = buf.pos_controller_status.vy.output;
+			log_msg.body.log_PCVY.out_p = buf.pos_controller_status.vy.output_proportional;
+			log_msg.body.log_PCVY.out_i = buf.pos_controller_status.vy.output_integral;
+			log_msg.body.log_PCVY.out_d = buf.pos_controller_status.vy.output_derivative;
+			log_msg.body.log_PCVY.mode = buf.pos_controller_status.vy.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCVY)		
+
+			// Z
+			log_msg.msg_type = LOG_PCSZ_MSG;
+			log_msg.body.log_PCSZ.p = buf.pos_controller_status.z.gain_proportional;
+			log_msg.body.log_PCSZ.i = buf.pos_controller_status.z.gain_integral;
+			log_msg.body.log_PCSZ.d = buf.pos_controller_status.z.gain_derivative;
+			log_msg.body.log_PCSZ.sample_rate = buf.pos_controller_status.z.sample_rate;
+			log_msg.body.log_PCSZ.sp = buf.pos_controller_status.z.setpoint;
+			log_msg.body.log_PCSZ.feedback = buf.pos_controller_status.z.feedback;
+			log_msg.body.log_PCSZ.out = buf.pos_controller_status.z.output;
+			log_msg.body.log_PCSZ.out_p = buf.pos_controller_status.z.output_proportional;
+			log_msg.body.log_PCSZ.out_i = buf.pos_controller_status.z.output_integral;
+			log_msg.body.log_PCSZ.out_d = buf.pos_controller_status.z.output_derivative;
+			log_msg.body.log_PCSZ.mode = buf.pos_controller_status.z.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCSZ)
+
+			// VZ
+			log_msg.msg_type = LOG_PCVZ_MSG;
+			log_msg.body.log_PCVZ.p = buf.pos_controller_status.vz.gain_proportional;
+			log_msg.body.log_PCVZ.i = buf.pos_controller_status.vz.gain_integral;
+			log_msg.body.log_PCVZ.d = buf.pos_controller_status.vz.gain_derivative;
+			log_msg.body.log_PCVZ.sample_rate = buf.pos_controller_status.vz.sample_rate;
+			log_msg.body.log_PCVZ.sp = buf.pos_controller_status.vz.setpoint;
+			log_msg.body.log_PCVZ.feedback = buf.pos_controller_status.vz.feedback;
+			log_msg.body.log_PCVZ.out = buf.pos_controller_status.vz.output;
+			log_msg.body.log_PCVZ.out_p = buf.pos_controller_status.vz.output_proportional;
+			log_msg.body.log_PCVZ.out_i = buf.pos_controller_status.vz.output_integral;
+			log_msg.body.log_PCVZ.out_d = buf.pos_controller_status.vz.output_derivative;
+			log_msg.body.log_PCVZ.mode = buf.pos_controller_status.vz.mode;
+			LOGBUFFER_WRITE_AND_COUNT(PCVZ)		
+		}
+
+		/* --- COMMANDER - POSITION CONTROLLER SETPOINT --- */
+		if (check_sdlog2_configuration("commander_position_controller_setpoint") && 
+			copy_if_updated(ORB_ID(commander_position_controller_setpoint), 
+				&subs.pos_controller_sp_sub, &buf.pos_controller_sp)) {
+
+			log_msg.msg_type = LOG_PCSP_MSG;
+			log_msg.body.log_PCSP.position_x = buf.pos_controller_sp.position_x;
+			log_msg.body.log_PCSP.position_y = buf.pos_controller_sp.position_y;
+			log_msg.body.log_PCSP.position_z = buf.pos_controller_sp.position_z;
+			log_msg.body.log_PCSP.velocity_x = buf.pos_controller_sp.velocity_x;
+			log_msg.body.log_PCSP.velocity_y = buf.pos_controller_sp.velocity_y;
+			log_msg.body.log_PCSP.velocity_z = buf.pos_controller_sp.velocity_z;
+			log_msg.body.log_PCSP.acceleration_x = buf.pos_controller_sp.acceleration_x;
+			log_msg.body.log_PCSP.acceleration_y = buf.pos_controller_sp.acceleration_y;
+			log_msg.body.log_PCSP.acceleration_z = buf.pos_controller_sp.acceleration_z;
+			log_msg.body.log_PCSP.roll = buf.pos_controller_sp.roll;
+			log_msg.body.log_PCSP.pitch = buf.pos_controller_sp.pitch;
+			log_msg.body.log_PCSP.yaw = buf.pos_controller_sp.yaw;
+			log_msg.body.log_PCSP.yaw_rate = buf.pos_controller_sp.yaw_rate;
+			log_msg.body.log_PCSP.yaw_manual_rpm = buf.pos_controller_sp.yaw_manual_rpm;
+			log_msg.body.log_PCSP.throttle = buf.pos_controller_sp.throttle;
+			LOGBUFFER_WRITE_AND_COUNT(PCSP)	
+		}
+
+		/* --- GAS MOTOR SETPOINT ARRAY --- */
+		if (check_sdlog2_configuration("gas_motor_setpoint_array") && 
+			copy_if_updated(ORB_ID(gas_motor_setpoint_array), 
+				&subs.gas_motor_sp_sub, &buf.gas_motor_sp)) {
+
+			log_msg.msg_type = LOG_GMSP_MSG;
+			log_msg.body.log_GMSP.sp_front = buf.gas_motor_sp.setpoint[FRONT];
+			log_msg.body.log_GMSP.sp_back = buf.gas_motor_sp.setpoint[BACK];
+			log_msg.body.log_GMSP.sp_right = buf.gas_motor_sp.setpoint[RIGHT];
+			log_msg.body.log_GMSP.sp_left = buf.gas_motor_sp.setpoint[LEFT];
+			LOGBUFFER_WRITE_AND_COUNT(GMSP)				
+		}
+
+		/* --- COMMANDER GAS MOTOR IGNITION REFERENCE --- */
+		if (check_sdlog2_configuration("commander_gas_motor_ignition_reference") &&
+			copy_if_updated(ORB_ID(commander_gas_motor_ignition_reference), 
+				&subs.gas_motor_ref_sub, &buf.gas_motor_ref)) {
+
+			log_msg.msg_type = LOG_MIRE_MSG;
+			log_msg.body.log_MIRE.id = buf.gas_motor_ref.id;
+			log_msg.body.log_MIRE.ignition = buf.gas_motor_ref.ignition ? 1 : 0;
+			LOGBUFFER_WRITE_AND_COUNT(MIRE)	
+		}
 
 		pthread_mutex_lock(&logbuffer_mutex);
 
