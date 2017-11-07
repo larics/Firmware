@@ -1007,6 +1007,13 @@ struct log_GMSP_s {
 	float sp_right;
 };
 
+/* --- COMMANDER GAS MOTOR IGNITION REFERENCE --- */
+#define LOG_MIRE_MSG 86
+struct log_MIRE_s {
+	uint8_t id;
+	uint8_t ignition;
+};
+
 /********** SYSTEM MESSAGES, ID > 0x80 **********/
 
 /* --- TIME - TIME STAMP --- */
@@ -1124,6 +1131,7 @@ static const struct log_format_s log_formats[] = {
 	LOG_FORMAT(PCVZ, "ffffffffffb", "p,i,d,s_rate,sp,fb,out,outp,outi,outd,m"),
 	LOG_FORMAT(PCSP, "fffffffffffffff", "x,y,z,vx,vy,vz,ax,ay,az,roll,pitch,yaw,yawR,yaw_manualRPM, trtl"),
 	LOG_FORMAT(GMSP, "ffff", "sp_front, sp_back, sp_left, sp_right"),
+	LOG_FORMAT(MIRE, "bb", "id,ignition"),
 	
 	// ***************************************
 

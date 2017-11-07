@@ -1,4 +1,3 @@
-TOPIC=controllers_reference                     ENABLED=true
 TOPIC=imu                                       ENABLED=true
 TOPIC=low_stack                                 ENABLED=false
 TOPIC=cpuload                                   ENABLED=false
@@ -46,3 +45,7 @@ TOPIC=commander_controllers_mode                ENABLED=false
 TOPIC=position_controller_status                ENABLED=true
 TOPIC=commander_position_controller_setpoint    ENABLED=true
 TOPIC=gas_motor_setpoint_array                  ENABLED=true
+TOPIC=commander_gas_motor_ignition_reference    ENABLED=true
+TOPIC=controllers_reference                     ENABLED=true
+TOPIC=mcu_controllers_reference                 ENABLED=true
+TOPIC=ctrl_sm_controllers_reference             ENABLED=true

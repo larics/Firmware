@@ -126,6 +126,7 @@
 #include <uORB/topics/position_controller_status.h>
 #include <uORB/topics/position_controller_setpoint.h>
 #include <uORB/topics/gas_motor_setpoint_array.h>
+#include <uORB/topics/gas_motor_ignition_reference.h>
 
 // *************************************
 
@@ -1258,6 +1259,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		struct position_controller_status_s pos_controller_status;
 		struct position_controller_setpoint_s pos_controller_sp;
 		struct gas_motor_setpoint_array_s gas_motor_sp;
+		struct gas_motor_ignition_reference_s gas_motor_ref;
 
 		// ******************************************************
 	} buf;
@@ -1349,6 +1351,8 @@ int sdlog2_thread_main(int argc, char *argv[])
 			struct log_PCVZ_s log_PCVZ;				// Position controller status - vz
 			struct log_PCSP_s log_PCSP;				// Position controller setpoint
 			struct log_GMSP_s log_GMSP;				// Gas motor setpoint array
+			struct log_MIRE_s log_MIRE;				// Gas motor ignition reference
+
 			// ******************************************************
 
 		} body;
@@ -1416,6 +1420,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 		int pos_controller_status_sub;
 		int pos_controller_sp_sub;
 		int gas_motor_sp_sub;
+		int gas_motor_ref_sub;
 
 		// ******************************************************
 	} subs;
@@ -1476,6 +1481,7 @@ int sdlog2_thread_main(int argc, char *argv[])
 	subs.pos_controller_status_sub = -1;
 	subs.pos_controller_sp_sub = -1;
 	subs.gas_motor_sp_sub = -1;
+	subs.gas_motor_ref_sub = -1;
 
 	// ******************************************************
 
@@ -2878,6 +2884,16 @@ int sdlog2_thread_main(int argc, char *argv[])
 			LOGBUFFER_WRITE_AND_COUNT(GMSP)				
 		}
 
+		/* --- COMMANDER GAS MOTOR IGNITION REFERENCE --- */
+		if (check_sdlog2_configuration("commander_gas_motor_ignition_reference") &&
+			copy_if_updated(ORB_ID(commander_gas_motor_ignition_reference), 
+				&subs.gas_motor_ref_sub, &buf.gas_motor_ref)) {
+
+			log_msg.msg_type = LOG_MIRE_MSG;
+			log_msg.body.log_MIRE.id = buf.gas_motor_ref.id;
+			log_msg.body.log_MIRE.ignition = buf.gas_motor_ref.ignition ? 1 : 0;
+			LOGBUFFER_WRITE_AND_COUNT(MIRE)	
+		}
 
 		pthread_mutex_lock(&logbuffer_mutex);
 

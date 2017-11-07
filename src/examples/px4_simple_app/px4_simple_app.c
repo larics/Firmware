@@ -56,6 +56,7 @@
 #include <uORB/topics/attitude_controller_reference.h>
 #include <uORB/topics/controllers_mode.h>
 #include <uORB/topics/position_controller_status.h>
+#include <uORB/topics/gas_motor_ignition_reference.h>
 
 __EXPORT int px4_simple_app_main(int argc, char *argv[]);
 
@@ -70,10 +71,10 @@ int px4_simple_app_main(int argc, char *argv[])
 	orb_set_interval(sensor_sub_fd, 200);
 
 	/* advertise attitude topic */
-	struct position_controller_status_s data;
+	struct controllers_reference_s data;
 	memset(&data, 0, sizeof(data));
 	//orb_advert_t att_pub = orb_advertise(ORB_ID(vehicle_attitude), &att);
-	orb_advert_t att_pub = orb_advertise(ORB_ID(position_controller_status), &data);
+	orb_advert_t att_pub = orb_advertise(ORB_ID(mcu_controllers_reference), &data);
 
 	/* one could wait for multiple topics with this technique, just using one here */
 	px4_pollfd_struct_t fds[] = {
@@ -123,19 +124,11 @@ int px4_simple_app_main(int argc, char *argv[])
 				//att.q[1] = raw.accelerometer_m_s2[1];
 				//att.q[2] = raw.accelerometer_m_s2[2];
 
-				struct pid_status_s stat;
-				memset(&stat, 0, sizeof(stat));
-				stat.gain_proportional = 1;
-				stat.gain_integral = 2;
-				stat.gain_derivative = 3; 
-
-				data.y = stat;
-				//data.armed = true;
-				//data.controller_x =  true;
-				//data.controller_y =  true;
+				data.x = raw.accelerometer_m_s2[0];
+				data.y = raw.accelerometer_m_s2[0];
 
 				//orb_publish(ORB_ID(vehicle_attitude), att_pub, &att);
-				orb_publish(ORB_ID(commander_controllers_mode), att_pub, &data);
+				orb_publish(ORB_ID(mcu_controllers_reference), att_pub, &data);
 			}
 
 			/* there could be more file descriptors here, in the form like:
