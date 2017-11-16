@@ -72,3 +72,23 @@ This repository contains code supporting these boards:
 ## Project Milestones
 
 The PX4 software and Pixhawk hardware (which has been designed for it) has been created in 2011 by Lorenz Meier.
+
+## Using MAVlink and QGroundControl for calibration
+`morus_master` branch builds MAVlink but does not run it on startup. To run it first stop some modules to clear memory needed for mavlink modules, ie:
+
+```
+rv stop
+morus_position_control stop
+vcu_uavcan stop
+```
+
+Then, to start MAVlink execute following commands:
+
+```
+mavlink start -r 1200
+mavlink start -d /dev/ttyS2 -b 57600 -m osd -r 1000
+mavlink start -r 800000 -d /dev/ttyACM0 -m config -x
+mavlink boot_complete
+```
+
+Everything is now set up to start QGroundControl and calibrate sensors that need calibration.

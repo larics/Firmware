@@ -584,6 +584,7 @@ then
 		fi
 	fi
 
+: <<'END'
 	if [ $MAVLINK_F == default ]
 	then
 		# Normal mode, use baudrate 57600 (default) and data rate 1000 bytes/s
@@ -685,7 +686,6 @@ then
 	fi
 
 	unset MAVLINK_COMPANION_DEVICE
-
 	#
 	# Starting stuff according to UAVCAN_ENABLE value
 	#
@@ -1075,3 +1075,4 @@ then
 	exit
 fi
 unset EXIT_ON_END
+END

@@ -99,7 +99,7 @@ set(config_module_list
 	modules/gpio_led
   #modules/land_detector
   modules/load_mon
-  #modules/mavlink
+  modules/mavlink
 	modules/navigator
   #modules/uavcan
 
