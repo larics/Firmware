@@ -173,6 +173,8 @@ then
 	#morus_mmc_vpc_attitude_control start
 	rv start
 	ekf2 start
+	sdlog2 start -r 200
+	sdlog2 on
 
 	#
 	# Set default values
