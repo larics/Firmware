@@ -63,3 +63,6 @@
 [submodule "src/morus_modules/rv"]
 	path = src/morus_modules/rv
 	url = git@github.com:larics/morus_attitude_control.git
+[submodule "src/mmuav_modules/mmuav_uavcan_px4"]
+	path = src/mmuav_modules/mmuav_uavcan_px4
+	url = git@github.com:larics/mmuav_uavcan_px4.git
