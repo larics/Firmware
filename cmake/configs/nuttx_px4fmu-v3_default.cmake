@@ -4,7 +4,7 @@ px4_nuttx_configure(HWCLASS m4 CONFIG nsh ROMFS y ROMFSROOT px4fmu_common)
 
 set(CMAKE_TOOLCHAIN_FILE ${PX4_SOURCE_DIR}/cmake/toolchains/Toolchain-arm-none-eabi.cmake)
 
-set(config_uavcan_num_ifaces 2)
+set(config_uavcan_num_ifaces 1)
 
 set(config_module_list
 
@@ -198,6 +198,8 @@ set(config_module_list
 
 	# EKF
   #examples/ekf_att_pos_estimator
+
+  mmuav_modules/mmuav_uavcan_px4
 )
 
 set(config_extra_builtin_cmds
