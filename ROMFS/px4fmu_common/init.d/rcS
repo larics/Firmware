@@ -572,8 +572,6 @@ then
 		fi
 	fi
 
-sdlog2 on
-: <<'END'
 	if [ $MAVLINK_F == default ]
 	then
 		# Normal mode, use baudrate 57600 (default) and data rate 1000 bytes/s
@@ -767,45 +765,6 @@ sdlog2 on
 	# Start MAVLink
 	mavlink start -r 800000 -d /dev/ttyACM0 -m config -x
 
-	#
-	# Logging
-	#
-	if ver hwcmp PX4FMU_V1
-	then
-		if sdlog2 start -r 30 -a -b 2 -t
-		then
-		fi
-	else
-		if param compare SYS_LOGGER 0
-		then
-			# check if we should increase logging rate for ekf2 replay message logging
-			if param greater EKF2_REC_RPL 0
-			then
-				if sdlog2 start -r 500 -e -b 18 -t
-				then
-				fi
-			else
-				if sdlog2 start -r 100 -a -b 9 -t
-				then
-				fi
-			fi
-		else
-			set LOGGER_ARGS ""
-			if param compare SDLOG_MODE 1
-			then
-				set LOGGER_ARGS "-e"
-			fi
-			if param compare SDLOG_MODE 2
-			then
-				set LOGGER_ARGS "-f"
-			fi
-
-			if logger start -b 12 -t ${LOGGER_ARGS}
-			then
-			fi
-			unset LOGGER_ARGS
-		fi
-	fi
 
 	#
 	# Start up ARDrone Motor interface
@@ -813,159 +772,6 @@ sdlog2 on
 	if [ $OUTPUT_MODE == ardrone ]
 	then
 		ardrone_interface start -d /dev/ttyS1
-	fi
-
-	#
-	# Fixed wing setup
-	#
-	if [ $VEHICLE_TYPE == fw ]
-	then
-		if [ $MIXER == none ]
-		then
-			# Set default mixer for fixed wing if not defined
-			set MIXER AERT
-		fi
-
-		if [ $MAV_TYPE == none ]
-		then
-			# Use MAV_TYPE = 1 (fixed wing) if not defined
-			set MAV_TYPE 1
-		fi
-
-		param set MAV_TYPE ${MAV_TYPE}
-
-		# Load mixer and configure outputs
-		sh /etc/init.d/rc.interface
-
-		# Start standard fixedwing apps
-		sh /etc/init.d/rc.fw_apps
-	fi
-
-	#
-	# Multicopters setup
-	#
-	if [ $VEHICLE_TYPE == mc ]
-	then
-		if [ $MIXER == none ]
-		then
-			echo "Mixer undefined"
-		fi
-
-		if [ $MAV_TYPE == none ]
-		then
-			# Use mixer to detect vehicle type
-			if [ $MIXER == quad_x -o $MIXER == quad_+ ]
-			then
-				set MAV_TYPE 2
-			fi
-			if [ $MIXER == quad_w -o $MIXER == quad_dc ]
-			then
-				set MAV_TYPE 2
-			fi
-			if [ $MIXER == quad_h ]
-			then
-				set MAV_TYPE 2
-			fi
-			if [ $MIXER == tri_y_yaw- -o $MIXER == tri_y_yaw+ ]
-			then
-				set MAV_TYPE 15
-			fi
-			if [ $MIXER == hexa_x -o $MIXER == hexa_+ ]
-			then
-				set MAV_TYPE 13
-			fi
-			if [ $MIXER == hexa_cox ]
-			then
-				set MAV_TYPE 13
-			fi
-			if [ $MIXER == octo_x -o $MIXER == octo_+ ]
-			then
-				set MAV_TYPE 14
-			fi
-			if [ $MIXER == octo_cox -o $MIXER == octo_cox_w ]
-			then
-				set MAV_TYPE 14
-			fi
-			if [ $MIXER == coax ]
-			then
-				set MAV_TYPE 3
-			fi
-		fi
-
-		# Still no MAV_TYPE found
-		if [ $MAV_TYPE == none ]
-		then
-			echo "Unknown MAV_TYPE"
-			param set MAV_TYPE 2
-		else
-			param set MAV_TYPE ${MAV_TYPE}
-		fi
-
-		# Load mixer and configure outputs
-		sh /etc/init.d/rc.interface
-
-		# Start standard multicopter apps
-		sh /etc/init.d/rc.mc_apps
-	fi
-
-	#
-	# VTOL setup
-	#
-	if [ $VEHICLE_TYPE == vtol ]
-	then
-		if [ $MIXER == none ]
-		then
-			echo "VTOL mixer undefined"
-		fi
-
-		if [ $MAV_TYPE == none ]
-		then
-			# Use mixer to detect vehicle type
-			if [ $MIXER == caipirinha_vtol ]
-			then
-				set MAV_TYPE 19
-			fi
-			if [ $MIXER == firefly6 ]
-			then
-				set MAV_TYPE 21
-			fi
-			if [ $MIXER == quad_x_pusher_vtol ]
-			then
-				set MAV_TYPE 22
-			fi
-		fi
-
-		# Still no MAV_TYPE found
-		if [ $MAV_TYPE == none ]
-		then
-			echo "Unknown MAV_TYPE"
-			param set MAV_TYPE 19
-		else
-			param set MAV_TYPE ${MAV_TYPE}
-		fi
-
-		# Load mixer and configure outputs
-		sh /etc/init.d/rc.interface
-
-		# Start standard vtol apps
-		sh /etc/init.d/rc.vtol_apps
-	fi
-
-	#
-	# Rover setup
-	#
-	if [ $VEHICLE_TYPE == rover ]
-	then
-		# 10 is MAV_TYPE_GROUND_ROVER
-		set MAV_TYPE 10
-
-		# Load mixer and configure outputs
-		sh /etc/init.d/rc.interface
-
-		# Start standard rover apps
-		sh /etc/init.d/rc.axialracing_ax10_apps
-
-		param set MAV_TYPE 10
 	fi
 
 	#
@@ -1048,6 +854,8 @@ sdlog2 on
 
 	fi
 
+	echo "odi u kiki"
+
 # End of autostart
 fi
 
@@ -1064,4 +872,3 @@ then
 	exit
 fi
 unset EXIT_ON_END
-END

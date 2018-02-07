@@ -123,9 +123,9 @@ set(config_module_list
 	#
 	# Logging
 	#
-	modules/logger
+	#modules/logger
 	#modules/log_filter
-	modules/sdlog2
+	#modules/sdlog2
 
 	#
 	# Library modules
@@ -199,7 +199,8 @@ set(config_module_list
 	# EKF
   #examples/ekf_att_pos_estimator
 
-  mmuav_modules/mmuav_uavcan_px4
+  	# MMUAV modules
+ 	mmuav_modules/mmuav_uavcan_px4
 )
 
 set(config_extra_builtin_cmds
