@@ -72,3 +72,6 @@
 [submodule "src/mmuav_modules/mmuav_px4_controller_commander"]
 	path = src/mmuav_modules/mmuav_px4_controller_commander
 	url = git@github.com:larics/morus_px4_controller_commander.git
+[submodule "src/mmuav_modules/mmuav_position_control"]
+	path = src/mmuav_modules/mmuav_position_control
+	url = git@github.com:larics/morus_position_control.git

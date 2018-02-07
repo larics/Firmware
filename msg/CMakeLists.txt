@@ -133,6 +133,7 @@ set(msg_file_names
 	morus/attitude_controller_status.msg
 	morus/controllers_mode.msg
 	morus/position_controller_setpoint.msg
+	morus/position_controller_status.msg
 	
 	)
 

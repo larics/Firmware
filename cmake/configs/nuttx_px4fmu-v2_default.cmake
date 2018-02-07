@@ -189,6 +189,7 @@ set(config_module_list
 	mmuav_modules/mmuav_uavcan_px4
 	mmuav_modules/mmuav_attitude_control
 	mmuav_modules/mmuav_px4_controller_commander
+	mmuav_modules/mmuav_position_control
 	morus_lib/pid
 )
 
