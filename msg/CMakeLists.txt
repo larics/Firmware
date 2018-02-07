@@ -134,6 +134,9 @@ set(msg_file_names
 	morus/controllers_mode.msg
 	morus/position_controller_setpoint.msg
 	morus/position_controller_status.msg
+	morus/controllers_reference.msg
+	morus/gas_motor_setpoint_array.msg
+	morus/gas_motor_ignition_reference.msg
 	
 	)
 
