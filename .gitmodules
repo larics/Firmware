@@ -75,3 +75,7 @@
 [submodule "src/mmuav_modules/mmuav_position_control"]
 	path = src/mmuav_modules/mmuav_position_control
 	url = git@github.com:larics/morus_position_control.git
+[submodule "src/mmuav_modules/mmuav_rotors_variation_attitude_control"]
+	path = src/mmuav_modules/mmuav_rotors_variation_attitude_control
+	url = git@github.com:larics/morus_attitude_control.git
+	branch = rotors_variation
