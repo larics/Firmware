@@ -119,7 +119,7 @@ set(config_module_list
 	# Logging
 	#
 	#modules/logger
-	#modules/sdlog2
+	modules/sdlog2
 
 	#
 	# Library modules
@@ -147,6 +147,7 @@ set(config_module_list
 	lib/tailsitter_recovery
 	lib/version
 	lib/DriverFramework/framework
+	lib/c_hashmap
 	platforms/nuttx
 
 	# had to add for cmake, not sure why wasn't in original config
