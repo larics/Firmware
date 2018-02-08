@@ -417,12 +417,12 @@ then
 	sh /etc/init.d/rc.sensors
 
 	# Needs to be this early for in-air-restarts
-	if [ $OUTPUT_MODE == hil ]
-	then
-	    commander start -hil
-	else
-	    commander start
-	fi
+	#if [ $OUTPUT_MODE == hil ]
+	#then
+	#    commander start -hil
+	#else
+	#    commander start
+	#fi
 
 	#
 	# Start CPU load monitor
