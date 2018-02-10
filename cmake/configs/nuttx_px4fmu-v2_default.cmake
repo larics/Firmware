@@ -90,7 +90,7 @@ set(config_module_list
 	#
 	# General system control
 	#
-	modules/commander
+	#modules/commander
 	modules/load_mon
 	modules/navigator
 	modules/mavlink
