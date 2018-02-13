@@ -4,7 +4,7 @@ px4_nuttx_configure(HWCLASS m4 CONFIG nsh ROMFS y ROMFSROOT px4fmu_common)
 
 set(CMAKE_TOOLCHAIN_FILE ${PX4_SOURCE_DIR}/cmake/toolchains/Toolchain-arm-none-eabi.cmake)
 
-set(config_uavcan_num_ifaces 1)
+set(config_uavcan_num_ifaces 2)
 
 set(config_module_list
 
@@ -95,7 +95,7 @@ set(config_module_list
 	#
 	# General system control
 	#
-	modules/commander
+	#modules/commander
 	modules/gpio_led
   #modules/land_detector
   modules/load_mon
@@ -200,7 +200,12 @@ set(config_module_list
   #examples/ekf_att_pos_estimator
 
   	# MMUAV modules
- 	mmuav_modules/mmuav_uavcan_px4
+	mmuav_modules/mmuav_uavcan_px4
+	mmuav_modules/mmuav_attitude_control
+	mmuav_modules/mmuav_px4_controller_commander
+	mmuav_modules/mmuav_position_control
+	mmuav_modules/mmuav_rotors_variation_attitude_control
+	morus_lib/pid
 )
 
 set(config_extra_builtin_cmds
