@@ -172,6 +172,7 @@ then
 	morus_position_control start
 	morus_mmc_vpc_attitude_control start
 	ekf2 start
+	# TODO: Add gps here
 
 	#
 	# Set default values
