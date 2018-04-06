@@ -83,7 +83,7 @@ set(config_module_list
 	drivers/sf0x/sf0x_tests
 	drivers/test_ppm
 	#lib/rc/rc_tests
-  modules/commander/commander_tests
+    #modules/commander/commander_tests
   #modules/controllib_test
   #modules/mavlink/mavlink_tests
   #modules/mc_pos_control/mc_pos_control_tests
@@ -94,21 +94,21 @@ set(config_module_list
 	#
 	# General system control
 	#
-	modules/commander
+	#modules/commander
 	modules/gpio_led
   #modules/land_detector
   modules/load_mon
-  modules/mavlink
+  #modules/mavlink
 	modules/navigator
   #modules/uavcan
 
 	#
 	# Estimation modules
 	#
-  modules/attitude_estimator_q
+    modules/attitude_estimator_q
 	modules/ekf2
     modules/local_position_estimator
-    modules/position_estimator_inav
+    #modules/position_estimator_inav
 
 	#
 	# Vehicle Control

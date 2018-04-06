@@ -159,6 +159,7 @@ int local_position_estimator_thread_main(int argc, char *argv[])
 
 	while (!thread_should_exit) {
 		est.update();
+		thread_should_exit = true;
 	}
 
 	PX4_DEBUG("exiting.");

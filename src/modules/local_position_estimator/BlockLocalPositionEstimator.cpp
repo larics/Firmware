@@ -5,6 +5,7 @@
 #include <systemlib/err.h>
 #include <matrix/math.hpp>
 #include <cstdlib>
+#include <string>
 
 orb_advert_t mavlink_log_pub = nullptr;
 
@@ -418,7 +419,7 @@ void BlockLocalPositionEstimator::update()
 				// make sure diagonal elements are positive
 				if (_P(i, i) <= 0) {
 					mavlink_and_console_log_info(&mavlink_log_pub,
-								     "%sreinit P (%d, %d) negative", msg_label, i, j);
+								     "%sreinit P (%d, %d) negative, %d", msg_label, i, j, (int)_P(i,i));
 					reinit_P = true;
 				}
 

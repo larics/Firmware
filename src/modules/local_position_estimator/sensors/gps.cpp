@@ -23,6 +23,7 @@ void BlockLocalPositionEstimator::gpsInit()
 		epv > _gps_epv_max.get() ||
 		fix_type < 3
 	) {
+		PX4_INFO("Resetting GPS and returning");
 		_gpsStats.reset();
 		return;
 	}
