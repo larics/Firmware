@@ -95,7 +95,7 @@ set(config_module_list
 	modules/navigator
 	modules/mavlink
 	modules/gpio_led
-	modules/uavcan
+	#modules/uavcan
 	modules/land_detector
 
 	#
@@ -109,17 +109,17 @@ set(config_module_list
 	#
 	# Vehicle Control
 	#
-	modules/fw_pos_control_l1
-	modules/fw_att_control
-	modules/mc_att_control
-	modules/mc_pos_control
-	modules/vtol_att_control
+	#modules/fw_pos_control_l1
+	#modules/fw_att_control
+	#modules/mc_att_control
+	#modules/mc_pos_control
+	#modules/vtol_att_control
 
 	#
 	# Logging
 	#
 	#modules/logger
-	modules/sdlog2
+	#modules/sdlog2
 
 	#
 	# Library modules
@@ -186,8 +186,17 @@ set(config_module_list
 	# Hardware test
 	#examples/hwtest
 
-	examples/publisher
-	examples/subscriber
+	#examples/publisher
+	#examples/subscriber
+
+	# MORUS modules and libraries
+	morus_lib/pid
+	morus_modules/morus_uavcan_px4
+	morus_modules/morus_px4_controller_commander
+	morus_modules/mv
+	morus_modules/rv
+	morus_modules/morus_position_control
+	morus_modules/morus_uav_low_level_sm
 )
 
 set(config_extra_builtin_cmds
