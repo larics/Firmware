@@ -171,7 +171,7 @@ then
 	morus_controller_commander start
 	morus_position_control start
 	#morus_mmc_vpc_attitude_control start
-	rv start
+	mv start
 	sdlog2 start -r 200
 	ekf2 start
 
