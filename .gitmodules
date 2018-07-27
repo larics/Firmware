@@ -79,3 +79,6 @@
 	path = src/mmuav_modules/mmuav_rotors_variation_attitude_control
 	url = git@github.com:larics/morus_attitude_control.git
 	branch = rotors_variation
+[submodule "src/mmuav_modules/mmuav_geom_ctl"]
+	path = src/mmuav_modules/mmuav_geom_ctl
+	url = git@github.com:lmark1/mmuav_geom_ctl.git
